@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dart Fundamentals — Módulo 01</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e3a5f;
+    --blue: #00d4ff;
+    --blue2: #0090d4;
+    --dart: #54c5f8;
+    --accent: #ff6b6b;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+  }
+  body.light-mode {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #e8edf5;
+    --border: #b0c4de;
+    --blue: #0070c0;
+    --blue2: #005fa3;
+    --dart: #0090cc;
+    --accent: #e03030;
+    --green: #16a34a;
+    --yellow: #d97706;
+    --text: #1a2235;
+    --muted: #4a5568;
+    --code-bg: #f8fafc;
+  }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    transition: all .2s; user-select: none;
+  }
+  .theme-toggle:hover { border-color: var(--blue); color: var(--blue); }
+  .toggle-icon { font-size: 14px; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* LAYOUT */
+  #app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* TOPBAR */
+  #topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .logo-text { font-size: 13px; font-weight: 600; color: var(--dart); letter-spacing: .5px; }
+  .progress-wrap { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+  .progress-bar { width: 160px; height: 4px; background: var(--border); border-radius: 2px; }
+  .progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), var(--dart)); transition: width .4s; }
+  .slide-counter { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* NAV PILLS */
+  #nav { display: flex; gap: 4px; padding: 8px 24px; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+  .nav-pill {
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+    white-space: nowrap; transition: all .2s;
+  }
+  .nav-pill:hover { border-color: var(--blue); color: var(--blue); }
+  .nav-pill.active { background: var(--blue); color: #000; border-color: var(--blue); }
+
+  /* SLIDES CONTAINER */
+  #slides { flex: 1; overflow: hidden; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: none; flex-direction: column;
+    padding: 32px 40px; overflow-y: auto;
+    animation: slideIn .3s ease;
+  }
+  .slide.active { display: flex; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SLIDE TYPES */
+  .slide-hero { justify-content: center; align-items: center; text-align: center; }
+  .slide-content { gap: 20px; }
+
+  /* TYPOGRAPHY */
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    background: rgba(0,212,255,.12); color: var(--blue); border: 1px solid rgba(0,212,255,.25);
+    margin-bottom: 12px;
+  }
+  h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 700; line-height: 1.1; }
+  h1 span { color: var(--dart); }
+  h2 { font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--dart); }
+  h3 { font-size: 16px; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
+  .subtitle { font-size: 16px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px;
+  }
+  .card.highlight { border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.05); }
+  .card.warn { border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.05); }
+  .card.good { border-color: rgba(74,222,128,.35); background: rgba(74,222,128,.05); }
+
+  /* CODE */
+  pre, code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  .kw { color: #ff79c6; }
+  .ty { color: var(--dart); }
+  .str { color: #f1fa8c; }
+  .cm { color: #6272a4; font-style: italic; }
+  .fn { color: #50fa7b; }
+  .nm { color: #bd93f9; }
+  .op { color: #ff79c6; }
+  .num { color: #bd93f9; }
+  body.light-mode .kw { color: #d6336c; }
+  body.light-mode .str { color: #2d8000; }
+  body.light-mode .cm { color: #6a737d; }
+  body.light-mode .fn { color: #005cc5; }
+  body.light-mode .nm { color: #6f42c1; }
+  body.light-mode .op { color: #d6336c; }
+  body.light-mode .num { color: #6f42c1; }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+  }
+  .badge.blue { background: rgba(0,212,255,.15); color: var(--blue); }
+  .badge.green { background: rgba(74,222,128,.15); color: var(--green); }
+  .badge.yellow { background: rgba(251,191,36,.15); color: var(--yellow); }
+  .badge.red { background: rgba(255,107,107,.15); color: var(--accent); }
+
+  /* LIST */
+  ul.dart-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.dart-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+  ul.dart-list li::before { content: '▸'; color: var(--blue); flex-shrink: 0; margin-top: 1px; }
+
+  /* EXERCISE */
+  .exercise {
+    background: var(--surface2); border: 1px solid rgba(251,191,36,.3);
+    border-radius: 12px; padding: 20px;
+  }
+  .exercise-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .ex-num { font-size: 11px; font-weight: 700; background: var(--yellow); color: #000; padding: 2px 8px; border-radius: 4px; }
+  .ex-title { font-size: 15px; font-weight: 600; }
+  .ex-body { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  .ex-steps { font-size: 13px; color: var(--text); line-height: 1.7; }
+  .ex-steps li { margin-left: 16px; margin-bottom: 4px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--surface2); color: var(--dart); font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 14px; border-bottom: 1px solid rgba(30,58,95,.5); color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  td code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+  /* BOTTOM NAV */
+  #bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 24px;
+    background: var(--surface); border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .btn {
+    padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; font-family: 'Space Grotesk', sans-serif;
+    transition: all .2s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+  .btn-primary { background: var(--blue); color: #000; }
+  .btn-primary:hover { background: var(--dart); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* SESSION BADGES */
+  .session-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+
+  /* HERO elements */
+  .hero-logo {
+    width: 80px; height: 80px; border-radius: 24px;
+    background: linear-gradient(135deg, #0090d4, #54c5f8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 20px;
+    box-shadow: 0 0 60px rgba(0,212,255,.25);
+  }
+  .topic-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    width: 100%; max-width: 560px; margin-top: 20px;
+  }
+  .topic-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 500;
+  }
+  .topic-num { color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo">
+      <div class="logo-dot">D</div>
+      <div class="logo-text">DART FUNDAMENTALS — Módulo 01</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><span class="toggle-icon">🌙</span><span id="themeLabel">Oscuro</span></div>
+      <span class="slide-counter" id="counter">1 / 23</span>
+      <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    </div>
+  </div>
+
+  <!-- NAV PILLS -->
+  <div id="nav">
+    <div class="nav-pill active" data-slide="0">Intro</div>
+    <div class="nav-pill" data-slide="1">Sesión 1</div>
+    <div class="nav-pill" data-slide="2">Sintaxis</div>
+    <div class="nav-pill" data-slide="3">Tipos</div>
+    <div class="nav-pill" data-slide="4">Null Safety</div>
+    <div class="nav-pill" data-slide="5">Ejercicios S1</div>
+    <div class="nav-pill" data-slide="6">Sesión 2</div>
+    <div class="nav-pill" data-slide="7">Operadores</div>
+    <div class="nav-pill" data-slide="8">Funciones</div>
+    <div class="nav-pill" data-slide="9">Control Flow</div>
+    <div class="nav-pill" data-slide="10">Ejercicios S2</div>
+    <div class="nav-pill" data-slide="11">Sesión 3</div>
+    <div class="nav-pill" data-slide="12">Colecciones</div>
+    <div class="nav-pill" data-slide="13">OOP</div>
+    <div class="nav-pill" data-slide="14">Constructores</div>
+    <div class="nav-pill" data-slide="15">Factory</div>
+    <div class="nav-pill" data-slide="16">Herencia</div>
+    <div class="nav-pill" data-slide="17">Ejercicios S3</div>
+    <div class="nav-pill" data-slide="18">Sesión 4</div>
+    <div class="nav-pill" data-slide="19">Async</div>
+    <div class="nav-pill" data-slide="20">Errores</div>
+    <div class="nav-pill" data-slide="21">Ejercicios S4</div>
+    <div class="nav-pill" data-slide="22">Proyecto Final</div>
+  </div>
+
+  <!-- SLIDES -->
+  <div id="slides">
+
+    <!-- 0: HERO -->
+    <div class="slide slide-hero active">
+      <div class="hero-logo">🎯</div>
+      <div class="tag">Módulo 01</div>
+      <h1>Dart <span>Fundamentals</span></h1>
+      <p class="subtitle">El lenguaje detrás de Flutter.<br>4 sesiones · 8 temas · desde cero.</p>
+      <div class="topic-grid">
+        <div class="topic-item"><span class="topic-num">01</span> Sintaxis & Básicos</div>
+        <div class="topic-item"><span class="topic-num">02</span> Variables & Tipos</div>
+        <div class="topic-item"><span class="topic-num">03</span> Operadores & Funciones</div>
+        <div class="topic-item"><span class="topic-num">04</span> Control Flow</div>
+        <div class="topic-item"><span class="topic-num">05</span> Colecciones</div>
+        <div class="topic-item"><span class="topic-num">06</span> OOP en Dart</div>
+        <div class="topic-item"><span class="topic-num">07</span> Programación Async</div>
+        <div class="topic-item"><span class="topic-num">08</span> Manejo de Errores</div>
+      </div>
+      <p style="margin-top:24px;font-size:12px;color:var(--muted);">Herramienta: <strong style="color:var(--dart);">dartpad.dev</strong> — sin instalación necesaria</p>
+    </div>
+
+    <!-- 1: SESIÓN 1 HEADER -->
+    <div class="slide slide-hero">
+      <div class="tag">Sesión 1</div>
+      <h1>Sintaxis, <span>Variables</span> y Tipos</h1>
+      <p class="subtitle">¿Cómo "habla" Dart? Estructura básica,<br>tipos de datos y null safety.</p>
+      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
+        <span class="badge blue">45 min — teoría</span>
+        <span class="badge green">30 min — práctica</span>
+        <span class="badge yellow">DartPad</span>
+      </div>
+    </div>
+
+    <!-- 2: SINTAXIS -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 1 · Tema 1</div>
+      <h2>Sintaxis & Estructura Básica</h2>
+      <div class="two-col">
+        <div>
+          <h3>Programa mínimo en Dart</h3>
+          <pre><span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="fn">print</span>(<span class="str">'Hola, Flutter!'</span>);
+}</pre>
+          <ul class="dart-list" style="margin-top:14px;">
+            <li><code>main()</code> es el punto de entrada obligatorio</li>
+            <li>Las sentencias terminan en <code>;</code></li>
+            <li><code>print()</code> imprime en consola</li>
+            <li>El código va dentro de llaves <code>{ }</code></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Comentarios</h3>
+          <pre><span class="cm">// Comentario de una línea
+
+/* Comentario
+   de bloque */
+
+/// Documentación (DartDoc)</span></pre>
+          <div class="card warn" style="margin-top:14px;">
+            <h3 style="color:var(--yellow);margin-bottom:6px;">💡 Tip para clase</h3>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Pide que escriban <em>su propio</em> "Hola Mundo" modificando el texto. Primer éxito = primera motivación.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: TIPOS -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 1 · Tema 2</div>
+      <h2>Variables & Tipos de Datos</h2>
+      <div class="two-col">
+        <div>
+          <h3>Declaración de variables</h3>
+          <pre><span class="cm">// Tipo explícito</span>
+<span class="ty">int</span> edad <span class="op">=</span> <span class="num">20</span>;
+<span class="ty">double</span> precio <span class="op">=</span> <span class="num">9.99</span>;
+<span class="ty">String</span> nombre <span class="op">=</span> <span class="str">'Ana'</span>;
+<span class="ty">bool</span> activo <span class="op">=</span> <span class="kw">true</span>;
+
+<span class="cm">// Inferencia de tipo</span>
+<span class="kw">var</span> ciudad <span class="op">=</span> <span class="str">'Guadalajara'</span>;
+
+<span class="cm">// Constantes</span>
+<span class="kw">const</span> pi <span class="op">=</span> <span class="num">3.14159</span>;
+<span class="kw">final</span> ahora <span class="op">=</span> DateTime.<span class="fn">now</span>();</pre>
+        </div>
+        <div>
+          <h3>Tipos principales</h3>
+          <table>
+            <tr><th>Tipo</th><th>Ejemplo</th><th>Uso</th><th>Tamaño</th></tr>
+            <tr><td><code>int</code></td><td><code>42</code></td><td>Enteros</td><td>64 bits</td></tr>
+            <tr><td><code>double</code></td><td><code>3.14</code></td><td>Decimales</td><td>64 bits (IEEE 754)</td></tr>
+            <tr><td><code>String</code></td><td><code>'hola'</code></td><td>Texto</td><td>Variable (UTF-16)</td></tr>
+            <tr><td><code>bool</code></td><td><code>true</code></td><td>Lógico</td><td>1 bit lógico</td></tr>
+            <tr><td><code>List</code></td><td><code>[1,2,3]</code></td><td>Lista</td><td>Variable (heap)</td></tr>
+            <tr><td><code>Map</code></td><td><code>{'k':v}</code></td><td>Clave-valor</td><td>Variable (heap)</td></tr>
+          </table>
+          <div class="card good" style="margin-top:12px;">
+            <p style="font-size:12px;color:var(--green);">✓ <strong>var vs final vs const</strong></p>
+            <p style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;"><code>var</code> puede cambiar · <code>final</code> se asigna una vez · <code>const</code> valor fijo en compilación</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4: NULL SAFETY -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 1 · Null Safety</div>
+      <h2>Null Safety — El superpoder de Dart</h2>
+      <div class="card highlight" style="margin-bottom:14px;">
+        <p style="font-size:13px;line-height:1.7;color:var(--text);">
+          <strong style="color:var(--dart);">¿Qué es Null Safety?</strong> Es un sistema que garantiza en tiempo de <em>compilación</em> que ninguna variable no-nullable pueda contener <code>null</code>. Dart introduce esto para eliminar el famoso <em>"Null Pointer Exception"</em> que afecta a lenguajes como Java o JavaScript. Con null safety, si intentas usar una variable que podría ser <code>null</code> sin comprobarlo antes, el compilador lanza un error — no tu app en producción.
+        </p>
+      </div>
+      <div class="two-col">
+        <div>
+          <h3>El problema del null</h3>
+          <pre><span class="cm">// ❌ Esto causa error en runtime</span>
+<span class="ty">String</span> nombre<span class="op">;</span>
+<span class="fn">print</span>(nombre.<span class="fn">length</span>); <span class="cm">// CRASH</span>
+
+<span class="cm">// ✅ Dart te avisa en compilación</span>
+<span class="ty">String</span> nombre<span class="op">;</span> <span class="cm">// Error: must be initialized</span>
+
+<span class="cm">// ✅ Si PUEDE ser null, decláralo</span>
+<span class="ty">String</span><span class="op">?</span> apellido<span class="op">;</span> <span class="cm">// nullable OK</span></pre>
+        </div>
+        <div>
+          <h3>Operadores de null</h3>
+          <pre><span class="ty">String</span><span class="op">?</span> nombre<span class="op">;</span>
+
+<span class="cm">// ?? — valor por defecto si es null</span>
+<span class="kw">var</span> n <span class="op">=</span> nombre <span class="op">??</span> <span class="str">'Anónimo'</span><span class="op">;</span>
+
+<span class="cm">// ?. — acceso seguro</span>
+<span class="kw">var</span> len <span class="op">=</span> nombre<span class="op">?.</span>length<span class="op">;</span>
+
+<span class="cm">// ! — forzar (úsalo con cuidado)</span>
+<span class="kw">var</span> len2 <span class="op">=</span> nombre<span class="op">!</span>.length<span class="op">;</span>
+
+<span class="cm">// ??= — asigna solo si la variable es null</span>
+<span class="ty">String</span><span class="op">?</span> ciudad<span class="op">;</span>
+ciudad <span class="op">??=</span> <span class="str">'Ciudad de México'</span><span class="op">;</span>
+<span class="fn">print</span>(ciudad)<span class="op">;</span> <span class="cm">// Ciudad de México</span>
+ciudad <span class="op">??=</span> <span class="str">'Guadalajara'</span><span class="op">;</span>
+<span class="fn">print</span>(ciudad)<span class="op">;</span> <span class="cm">// Ciudad de México (no cambia)</span></pre>
+          <div class="card highlight" style="margin-top:12px;">
+            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 Null safety elimina una de las fuentes de errores más comunes en programación.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EJ S1: EJERCICIOS SESIÓN 1 -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 1 · Ejercicios</div>
+      <h2>Ejercicios — Sesión 1</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 1</span><span class="ex-title">Perfil de usuario</span><span class="badge blue">Sintaxis · Tipos</span></div>
+          <p class="ex-body">Declara variables con tus datos personales usando tipos explícitos e inferidos. Muestra todo en consola con string interpolation.</p>
+          <ol class="ex-steps">
+            <li>Declara <code>nombre</code> (String), <code>edad</code> (int), <code>altura</code> (double), <code>esEstudiante</code> (bool)</li>
+            <li>Usa <code>var</code> para la ciudad y <code>const</code> para el año de nacimiento</li>
+            <li>Imprime un resumen completo con <code>print()</code> usando interpolación</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 2</span><span class="ex-title">Calculadora básica</span><span class="badge blue">Tipos · Operadores</span></div>
+          <p class="ex-body">Aplica los tipos numéricos y operadores aritméticos de Dart en una mini calculadora.</p>
+          <ol class="ex-steps">
+            <li>Define dos <code>double</code>: <code>a = 17.5</code> y <code>b = 4.0</code></li>
+            <li>Calcula e imprime: suma, resta, multiplicación, división, módulo y división entera (<code>~/</code>)</li>
+            <li><strong>Bonus:</strong> convierte el resultado de la división a <code>int</code> con <code>.toInt()</code></li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 3</span><span class="ex-title">Null Safety en práctica</span><span class="badge blue">Null Safety</span></div>
+          <p class="ex-body">Experimenta con variables nullable y los operadores <code>??</code>, <code>?.</code> y <code>??=</code>.</p>
+          <ol class="ex-steps">
+            <li>Declara <code>String? apodo</code> sin valor inicial</li>
+            <li>Usa <code>??=</code> para asignarle "Sin apodo" si es null</li>
+            <li>Imprime su longitud de forma segura con <code>?.</code></li>
+            <li>Declara una segunda nullable y usa <code>??</code> para un valor por defecto</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 4</span><span class="ex-title">Constantes y final</span><span class="badge blue">Variables</span></div>
+          <p class="ex-body">Entiende la diferencia entre <code>var</code>, <code>final</code> y <code>const</code> intentando modificar cada una.</p>
+          <ol class="ex-steps">
+            <li>Declara una <code>var</code>, un <code>final</code> y un <code>const</code></li>
+            <li>Intenta reasignar las tres — ¿qué errores da el compilador?</li>
+            <li>Usa <code>final</code> para guardar <code>DateTime.now()</code> y muéstrala</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 5</span><span class="ex-title">Calculadora de IMC</span><span class="badge yellow">Integrador S1</span></div>
+          <p class="ex-body">Integra: variables, tipos, operadores, null safety e interpolación.</p>
+          <ol class="ex-steps">
+            <li>Declara <code>double peso</code> y <code>double? altura</code> (nullable)</li>
+            <li>Usa <code>??</code> para proporcionar altura por defecto si es null</li>
+            <li>Calcula el IMC: <code>peso / (altura * altura)</code></li>
+            <li>Imprime el resultado con 2 decimales usando <code>.toStringAsFixed(2)</code></li>
+            <li><strong>Bonus:</strong> muestra la clasificación con operador ternario</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5: SESIÓN 2 HEADER -->
+    <div class="slide slide-hero">
+      <div class="tag">Sesión 2</div>
+      <h1>Operadores, <span>Funciones</span> y Control Flow</h1>
+      <p class="subtitle">La lógica del programa: cómo tomar decisiones<br>y cómo organizar código reutilizable.</p>
+      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
+        <span class="badge blue">40 min — teoría</span>
+        <span class="badge green">35 min — práctica</span>
+      </div>
+    </div>
+
+    <!-- 6: OPERADORES -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 2 · Tema 3</div>
+      <h2>Operadores & Funciones</h2>
+      <div class="two-col">
+        <div>
+          <h3>Operadores comunes</h3>
+          <table>
+            <tr><th>Tipo</th><th>Operadores</th></tr>
+            <tr><td>Aritméticos</td><td><code>+ - * / % ~/</code></td></tr>
+            <tr><td>Comparación</td><td><code>== != &lt; &gt; &lt;= &gt;=</code></td></tr>
+            <tr><td>Lógicos</td><td><code>&amp;&amp; || !</code></td></tr>
+            <tr><td>Asignación</td><td><code>= += -= *= /=</code></td></tr>
+            <tr><td>Tipo</td><td><code>is  is!  as</code></td></tr>
+          </table>
+          <pre style="margin-top:12px;"><span class="kw">var</span> a <span class="op">=</span> <span class="num">10</span><span class="op">;</span>
+<span class="kw">var</span> b <span class="op">=</span> <span class="num">3</span><span class="op">;</span>
+<span class="fn">print</span>(a <span class="op">~/</span> b)<span class="op">;</span>  <span class="cm">// 3 (división entera)</span>
+<span class="fn">print</span>(a <span class="op">%</span>  b)<span class="op">;</span>  <span class="cm">// 1 (módulo)</span></pre>
+        </div>
+        <div>
+          <h3>Funciones</h3>
+          <pre><span class="cm">// Función con tipo de retorno</span>
+<span class="ty">int</span> <span class="fn">sumar</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) {
+  <span class="kw">return</span> a <span class="op">+</span> b<span class="op">;</span>
+}
+
+<span class="cm">// Arrow function (una línea)</span>
+<span class="ty">int</span> <span class="fn">multiplicar</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) <span class="op">=></span> a <span class="op">*</span> b<span class="op">;</span>
+
+<span class="cm">// Parámetros opcionales</span>
+<span class="kw">void</span> <span class="fn">saludar</span>(<span class="ty">String</span> nombre, {<span class="ty">String</span> titulo <span class="op">=</span> <span class="str">'Sr.'</span>}) {
+  <span class="fn">print</span>(<span class="str">'Hola </span><span class="op">$</span>titulo <span class="op">$</span>nombre<span class="str">'</span>)<span class="op">;</span>
+}
+
+<span class="cm">// Llamada</span>
+<span class="fn">saludar</span>(<span class="str">'García'</span>, titulo: <span class="str">'Dr.'</span>)<span class="op">;</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7: FUNCIONES AVANZADO -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 2 · Tema 3 cont.</div>
+      <h2>Funciones como ciudadanos de primera clase</h2>
+      <div class="two-col">
+        <div>
+          <h3>Funciones anónimas (lambdas)</h3>
+          <pre><span class="cm">// Función almacenada en variable</span>
+<span class="kw">var</span> duplicar <span class="op">=</span> (<span class="ty">int</span> n) <span class="op">=></span> n <span class="op">*</span> <span class="num">2</span><span class="op">;</span>
+<span class="fn">print</span>(<span class="fn">duplicar</span>(<span class="num">5</span>))<span class="op">;</span> <span class="cm">// 10</span>
+
+<span class="cm">// Función como parámetro</span>
+<span class="kw">var</span> numeros <span class="op">=</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]<span class="op">;</span>
+<span class="kw">var</span> pares <span class="op">=</span> numeros.<span class="fn">where</span>((n) <span class="op">=></span> n <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span>)<span class="op">;</span>
+<span class="fn">print</span>(pares)<span class="op">;</span> <span class="cm">// (2, 4)</span></pre>
+        </div>
+        <div>
+          <h3>String interpolation</h3>
+          <pre><span class="kw">var</span> nombre <span class="op">=</span> <span class="str">'Carlos'</span><span class="op">;</span>
+<span class="kw">var</span> edad <span class="op">=</span> <span class="num">22</span><span class="op">;</span>
+
+<span class="cm">// Con $variable</span>
+<span class="fn">print</span>(<span class="str">'Soy </span><span class="op">$</span>nombre<span class="str">'</span>)<span class="op">;</span>
+
+<span class="cm">// Con ${expresión}</span>
+<span class="fn">print</span>(<span class="str">'En 10 años tendré </span><span class="op">${</span>edad <span class="op">+</span> <span class="num">10</span><span class="op">}</span><span class="str">'</span>)<span class="op">;</span>
+
+<span class="cm">// Multilínea</span>
+<span class="kw">var</span> mensaje <span class="op">=</span> <span class="str">'''
+  Nombre: </span><span class="op">$</span>nombre
+  Edad: <span class="op">$</span>edad años
+<span class="str">'''</span><span class="op">;</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8: CONTROL FLOW -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 2 · Tema 4</div>
+      <h2>Control Flow</h2>
+      <div class="two-col">
+        <div>
+          <h3>Condicionales</h3>
+          <pre><span class="cm">// if / else if / else</span>
+<span class="kw">if</span> (nota <span class="op">>=</span> <span class="num">90</span>) {
+  <span class="fn">print</span>(<span class="str">'A'</span>)<span class="op">;</span>
+} <span class="kw">else if</span> (nota <span class="op">>=</span> <span class="num">80</span>) {
+  <span class="fn">print</span>(<span class="str">'B'</span>)<span class="op">;</span>
+} <span class="kw">else</span> {
+  <span class="fn">print</span>(<span class="str">'Reprobado'</span>)<span class="op">;</span>
+}
+
+<span class="cm">// Ternario</span>
+<span class="kw">var</span> estado <span class="op">=</span> nota <span class="op">>=</span> <span class="num">70</span> <span class="op">?</span> <span class="str">'Aprobado'</span> <span class="op">:</span> <span class="str">'Reprobado'</span><span class="op">;</span>
+
+<span class="cm">// Switch</span>
+<span class="kw">switch</span> (dia) {
+  <span class="kw">case</span> <span class="str">'lunes'</span>:
+    <span class="fn">print</span>(<span class="str">'Inicio de semana'</span>)<span class="op">;</span>
+    <span class="kw">break</span><span class="op">;</span>
+  <span class="kw">default</span>:
+    <span class="fn">print</span>(<span class="str">'Otro día'</span>)<span class="op">;</span>
+}</pre>
+        </div>
+        <div>
+          <h3>Bucles</h3>
+          <pre><span class="cm">// for clásico</span>
+<span class="kw">for</span> (<span class="kw">var</span> i <span class="op">=</span> <span class="num">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="num">5</span><span class="op">;</span> i<span class="op">++</span>) {
+  <span class="fn">print</span>(i)<span class="op">;</span>
+}
+
+<span class="cm">// for-in (sobre colecciones)</span>
+<span class="kw">var</span> frutas <span class="op">=</span> [<span class="str">'manzana'</span>, <span class="str">'pera'</span>]<span class="op">;</span>
+<span class="kw">for</span> (<span class="kw">var</span> f <span class="kw">in</span> frutas) {
+  <span class="fn">print</span>(f)<span class="op">;</span>
+}
+
+<span class="cm">// while</span>
+<span class="kw">var</span> n <span class="op">=</span> <span class="num">0</span><span class="op">;</span>
+<span class="kw">while</span> (n <span class="op">&lt;</span> <span class="num">3</span>) {
+  <span class="fn">print</span>(n<span class="op">++</span>)<span class="op">;</span>
+}
+
+<span class="cm">// do..while — ejecuta al menos una vez</span>
+<span class="kw">var</span> intento <span class="op">=</span> <span class="num">0</span><span class="op">;</span>
+<span class="kw">do</span> {
+  <span class="fn">print</span>(<span class="str">'Intento: </span><span class="op">$</span>intento<span class="str">'</span>)<span class="op">;</span>
+  intento<span class="op">++;</span>
+} <span class="kw">while</span> (intento <span class="op">&lt;</span> <span class="num">3</span>)<span class="op">;</span>
+<span class="cm">// Imprime: Intento: 0, 1, 2</span>
+
+<span class="cm">// break y continue</span>
+<span class="kw">for</span> (<span class="kw">var</span> i <span class="op">=</span> <span class="num">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="num">10</span><span class="op">;</span> i<span class="op">++</span>) {
+  <span class="kw">if</span> (i <span class="op">==</span> <span class="num">5</span>) <span class="kw">break</span><span class="op">;</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- EJ S2: EJERCICIOS SESIÓN 2 -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 2 · Ejercicios</div>
+      <h2>Ejercicios — Sesión 2</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 1</span><span class="ex-title">Tabla de multiplicar</span><span class="badge blue">Bucles · Operadores</span></div>
+          <p class="ex-body">Usa un bucle <code>for</code> para imprimir la tabla de multiplicar de cualquier número.</p>
+          <ol class="ex-steps">
+            <li>Define <code>int tabla = 7</code></li>
+            <li>Con un <code>for</code> del 1 al 12, imprime cada producto con interpolación</li>
+            <li><strong>Bonus:</strong> usa <code>while</code> para hacer lo mismo</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 2</span><span class="ex-title">Validador con do..while</span><span class="badge blue">do..while · Control Flow</span></div>
+          <p class="ex-body">Simula un sistema que sigue pidiendo reintentos hasta lograrlo, usando <code>do..while</code>.</p>
+          <ol class="ex-steps">
+            <li>Declara <code>int intentos = 0</code> y <code>bool exito = false</code></li>
+            <li>En un bloque <code>do..while</code>, incrementa intentos e imprime "Intento #N"</li>
+            <li>Simula éxito cuando <code>intentos == 3</code> cambiando <code>exito = true</code></li>
+            <li>El loop debe continuar mientras <code>!exito</code></li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 3</span><span class="ex-title">FizzBuzz con funciones</span><span class="badge blue">Funciones · Bucles</span></div>
+          <p class="ex-body">Encapsula la lógica en una función reutilizable usando parámetros nombrados opcionales.</p>
+          <ol class="ex-steps">
+            <li>Crea función <code>fizzBuzz(int n, {int div1 = 3, int div2 = 5})</code></li>
+            <li>Retorna "FizzBuzz", "Fizz", "Buzz" o el número según corresponda</li>
+            <li>Con un <code>for</code> del 1 al 30, llama la función e imprime cada resultado</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 4</span><span class="ex-title">Funciones como valores</span><span class="badge blue">Lambdas · Funciones</span></div>
+          <p class="ex-body">Practica el uso de funciones anónimas y arrow functions almacenadas en variables.</p>
+          <ol class="ex-steps">
+            <li>Crea una lista de 5 números enteros</li>
+            <li>Usa <code>.where()</code> con lambda para filtrar los pares</li>
+            <li>Usa <code>.map()</code> para elevar cada par al cuadrado</li>
+            <li>Imprime el resultado con <code>.toList()</code></li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 5</span><span class="ex-title">Clasificador de notas</span><span class="badge yellow">Integrador S2</span></div>
+          <p class="ex-body">Combina funciones, condicionales, switch y bucles en un clasificador de calificaciones.</p>
+          <ol class="ex-steps">
+            <li>Crea función <code>String calificacion(int nota)</code> que retorne "A", "B", "C", "D" o "F"</li>
+            <li>Usa <code>switch</code> interno o condicionales encadenados</li>
+            <li>Con un <code>for</code>, evalúa la lista: <code>[95, 82, 71, 60, 45]</code></li>
+            <li>Imprime cada nota con su letra usando string interpolation</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9: SESIÓN 3 HEADER -->
+    <div class="slide slide-hero">
+      <div class="tag">Sesión 3</div>
+      <h1>Colecciones y <span>OOP</span></h1>
+      <p class="subtitle">Estructuras de datos en Dart y<br>programación orientada a objetos.</p>
+      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
+        <span class="badge blue">40 min — teoría</span>
+        <span class="badge green">35 min — práctica</span>
+      </div>
+    </div>
+
+    <!-- 10: COLECCIONES -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 5</div>
+      <h2>Colecciones</h2>
+      <div class="two-col">
+        <div>
+          <h3>List</h3>
+          <pre><span class="ty">List</span><span class="op">&lt;</span><span class="ty">int</span><span class="op">&gt;</span> nums <span class="op">=</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]<span class="op">;</span>
+nums.<span class="fn">add</span>(<span class="num">4</span>)<span class="op">;</span>
+nums.<span class="fn">remove</span>(<span class="num">1</span>)<span class="op">;</span>
+<span class="fn">print</span>(nums.<span class="fn">length</span>)<span class="op">;</span>   <span class="cm">// 3</span>
+<span class="fn">print</span>(nums[<span class="num">0</span>])<span class="op">;</span>       <span class="cm">// 2</span>
+
+<span class="cm">// Métodos funcionales</span>
+<span class="kw">var</span> dobles <span class="op">=</span> nums.<span class="fn">map</span>((n) <span class="op">=></span> n <span class="op">*</span> <span class="num">2</span>).<span class="fn">toList</span>()</pre>
+          <h3 style="margin-top:14px;">Set</h3>
+          <pre><span class="ty">Set</span><span class="op">&lt;</span><span class="ty">String</span><span class="op">&gt;</span> colores <span class="op">=</span> {<span class="str">'rojo'</span>, <span class="str">'azul'</span>}<span class="op">;</span>
+colores.<span class="fn">add</span>(<span class="str">'rojo'</span>)<span class="op">;</span> <span class="cm">// no duplica</span></pre>
+        </div>
+        <div>
+          <h3>Map</h3>
+          <pre><span class="ty">Map</span><span class="op">&lt;</span><span class="ty">String</span>, <span class="ty">dynamic</span><span class="op">&gt;</span> alumno <span class="op">=</span> {
+  <span class="str">'nombre'</span>: <span class="str">'Laura'</span>,
+  <span class="str">'edad'</span>: <span class="num">20</span>,
+  <span class="str">'promedio'</span>: <span class="num">9.2</span>,
+}<span class="op">;</span>
+
+<span class="fn">print</span>(alumno[<span class="str">'nombre'</span>])<span class="op">;</span> <span class="cm">// Laura</span>
+alumno[<span class="str">'semestre'</span>] <span class="op">=</span> <span class="num">3</span><span class="op">;</span>
+
+<span class="cm">// Iterar</span>
+alumno.<span class="fn">forEach</span>((k, v) <span class="op">=></span> <span class="fn">print</span>(<span class="str">'</span><span class="op">$</span>k: <span class="op">$</span>v<span class="str">'</span>))<span class="op">;</span></pre>
+          <div class="card good" style="margin-top:12px;">
+            <p style="font-size:12px;color:var(--green);margin-bottom:4px;">✓ Métodos útiles de List</p>
+            <p style="font-size:12px;color:var(--muted);line-height:1.7;"><code>map()</code> · <code>where()</code> · <code>reduce()</code> · <code>any()</code> · <code>every()</code> · <code>sort()</code> · <code>first</code> · <code>last</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11: OOP -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6</div>
+      <h2>OOP en Dart — Clases y Objetos</h2>
+      <div class="two-col">
+        <div>
+          <h3>Clase básica</h3>
+          <pre><span class="kw">class</span> <span class="ty">Persona</span> {
+  <span class="cm">// Propiedades</span>
+  <span class="ty">String</span> nombre<span class="op">;</span>
+  <span class="ty">int</span> edad<span class="op">;</span>
+
+  <span class="cm">// Constructor</span>
+  <span class="ty">Persona</span>(<span class="kw">this</span>.nombre, <span class="kw">this</span>.edad)<span class="op">;</span>
+
+  <span class="cm">// Método</span>
+  <span class="kw">void</span> <span class="fn">presentarse</span>() {
+    <span class="fn">print</span>(<span class="str">'Soy </span><span class="op">$</span>nombre, tengo <span class="op">$</span>edad años<span class="str">'</span>)<span class="op">;</span>
+  }
+
+  <span class="cm">// Getter</span>
+  <span class="ty">bool</span> <span class="kw">get</span> esMayor <span class="op">=></span> edad <span class="op">>=</span> <span class="num">18</span><span class="op">;</span>
+}
+
+<span class="cm">// Uso</span>
+<span class="kw">var</span> p <span class="op">=</span> <span class="ty">Persona</span>(<span class="str">'Ana'</span>, <span class="num">21</span>)<span class="op">;</span>
+p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
+        </div>
+        <div>
+          <h3>Constructor nombrado</h3>
+          <pre><span class="kw">class</span> <span class="ty">Punto</span> {
+  <span class="ty">double</span> x, y<span class="op">;</span>
+  <span class="ty">Punto</span>(<span class="kw">this</span>.x, <span class="kw">this</span>.y)<span class="op">;</span>
+
+  <span class="cm">// Constructor nombrado</span>
+  <span class="ty">Punto</span>.origen() : x <span class="op">=</span> <span class="num">0</span>, y <span class="op">=</span> <span class="num">0</span><span class="op">;</span>
+
+  <span class="cm">// toString override</span>
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="ty">String</span> <span class="fn">toString</span>() <span class="op">=></span> <span class="str">'(</span><span class="op">$</span>x, <span class="op">$</span>y<span class="str">)'</span><span class="op">;</span>
+}
+
+<span class="kw">var</span> p1 <span class="op">=</span> <span class="ty">Punto</span>(<span class="num">3.0</span>, <span class="num">4.0</span>)<span class="op">;</span>
+<span class="kw">var</span> p0 <span class="op">=</span> <span class="ty">Punto</span>.origen()<span class="op">;</span></pre>
+          <div class="card highlight" style="margin-top:12px;">
+            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 En Dart, <code>this.campo</code> en el constructor es un atajo que inicializa y asigna automáticamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12: CONSTRUCTORES NOMBRADOS -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6 cont.</div>
+      <h2>Constructores Nombrados</h2>
+      <div class="two-col">
+        <div>
+          <h3>¿Por qué existen?</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px;">
+            Dart <strong style="color:var(--text);">no permite sobrecarga</strong> de constructores por firma (como Java o C++). Los constructores nombrados son la solución: permiten múltiples formas de crear un objeto, cada una con semántica clara y explícita.
+          </p>
+          <div class="card highlight" style="margin-bottom:12px;">
+            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 Sintaxis: <code>NombreClase.nombreConstructor(...)</code> — el punto separa la clase del constructor.</p>
+          </div>
+          <h3>Lista de inicialización</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            El <code>:</code> tras los parámetros inicia la <em>initializer list</em>: se ejecuta antes del cuerpo del constructor y permite asignar campos <code>final</code>.
+          </p>
+          <pre><span class="kw">class</span> <span class="ty">Punto</span> {
+  <span class="kw">final</span> <span class="ty">double</span> x, y<span class="op">;</span>
+
+  <span class="cm">// Constructor por defecto</span>
+  <span class="ty">Punto</span>(<span class="kw">this</span>.x, <span class="kw">this</span>.y)<span class="op">;</span>
+
+  <span class="cm">// Constructor nombrado — origen</span>
+  <span class="ty">Punto</span>.<span class="fn">origen</span>() : x <span class="op">=</span> <span class="num">0</span>, y <span class="op">=</span> <span class="num">0</span><span class="op">;</span>
+
+  <span class="cm">// Constructor nombrado — desde Map</span>
+  <span class="ty">Punto</span>.<span class="fn">desdeMap</span>(<span class="ty">Map</span><span class="op">&lt;</span><span class="ty">String</span>, <span class="ty">double</span><span class="op">&gt;</span> m)
+      : x <span class="op">=</span> m[<span class="str">'x'</span>] <span class="op">??</span> <span class="num">0</span>, y <span class="op">=</span> m[<span class="str">'y'</span>] <span class="op">??</span> <span class="num">0</span><span class="op">;</span>
+
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="ty">String</span> <span class="fn">toString</span>() <span class="op">=></span> <span class="str">'(</span><span class="op">$</span>x, <span class="op">$</span>y<span class="str">)'</span><span class="op">;</span>
+}
+
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="kw">var</span> p1 <span class="op">=</span> <span class="ty">Punto</span>(<span class="num">3.0</span>, <span class="num">4.0</span>)<span class="op">;</span>          <span class="cm">// (3.0, 4.0)</span>
+  <span class="kw">var</span> p0 <span class="op">=</span> <span class="ty">Punto</span>.<span class="fn">origen</span>()<span class="op">;</span>            <span class="cm">// (0.0, 0.0)</span>
+  <span class="kw">var</span> p2 <span class="op">=</span> <span class="ty">Punto</span>.<span class="fn">desdeMap</span>({<span class="str">'x'</span>: <span class="num">5.0</span>, <span class="str">'y'</span>: <span class="num">2.0</span>})<span class="op">;</span>
+}</pre>
+        </div>
+        <div>
+          <h3>Redirección de constructores</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            Un constructor puede delegar en otro del mismo objeto usando <code>: this(...)</code>. Evita duplicar lógica.
+          </p>
+          <pre><span class="kw">class</span> <span class="ty">Rectangulo</span> {
+  <span class="kw">final</span> <span class="ty">double</span> ancho, alto<span class="op">;</span>
+
+  <span class="ty">Rectangulo</span>(<span class="kw">this</span>.ancho, <span class="kw">this</span>.alto)<span class="op">;</span>
+
+  <span class="cm">// Redirige al constructor principal</span>
+  <span class="ty">Rectangulo</span>.<span class="fn">cuadrado</span>(<span class="ty">double</span> lado) : <span class="kw">this</span>(lado, lado)<span class="op">;</span>
+}
+
+<span class="kw">var</span> r <span class="op">=</span> <span class="ty">Rectangulo</span>.<span class="fn">cuadrado</span>(<span class="num">5.0</span>)<span class="op">;</span>
+<span class="cm">// ancho: 5.0, alto: 5.0</span></pre>
+
+          <h3 style="margin-top:14px;">Constructores <code>const</code> nombrados</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            Si todos los campos son <code>final</code> y los valores son constantes en tiempo de compilación, Dart <strong style="color:var(--text);">canonicaliza</strong> la instancia: dos llamadas con los mismos valores devuelven <em>el mismo objeto en memoria</em>.
+          </p>
+          <pre><span class="kw">class</span> <span class="ty">Borde</span> {
+  <span class="kw">final</span> <span class="ty">double</span> radio<span class="op">;</span>
+  <span class="kw">const</span> <span class="ty">Borde</span>(<span class="kw">this</span>.radio)<span class="op">;</span>
+  <span class="kw">const</span> <span class="ty">Borde</span>.<span class="fn">circular</span>() : radio <span class="op">=</span> <span class="num">100</span><span class="op">;</span>
+  <span class="kw">const</span> <span class="ty">Borde</span>.<span class="fn">ninguno</span>()  : radio <span class="op">=</span> <span class="num">0</span><span class="op">;</span>
+}
+
+<span class="kw">const</span> a <span class="op">=</span> <span class="ty">Borde</span>.<span class="fn">circular</span>()<span class="op">;</span>
+<span class="kw">const</span> b <span class="op">=</span> <span class="ty">Borde</span>.<span class="fn">circular</span>()<span class="op">;</span>
+<span class="fn">print</span>(<span class="fn">identical</span>(a, b))<span class="op">;</span> <span class="cm">// true → mismo objeto</span></pre>
+          <div class="card good" style="margin-top:12px;">
+            <p style="font-size:12px;color:var(--green);margin-bottom:4px;">✓ Flutter usa esto masivamente</p>
+            <p style="font-size:12px;color:var(--muted);line-height:1.6;"><code>EdgeInsets.all()</code> · <code>BorderRadius.circular()</code> · <code>SizedBox.shrink()</code> — todos son constructores nombrados <code>const</code>.</p>
+          </div>
+          <div class="card warn" style="margin-top:10px;">
+            <p style="font-size:12px;color:var(--yellow);margin-bottom:4px;">⚠ Regla de diseño</p>
+            <p style="font-size:12px;color:var(--muted);line-height:1.6;">Un constructor nombrado <strong style="color:var(--text);">siempre retorna una nueva instancia</strong> de la clase. Si necesitas control total (retornar instancia existente, subclase, etc.) → usa <code>factory</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13: CONSTRUCTORES FACTORY -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6 cont.</div>
+      <h2>Constructores de Fábrica — <code>factory</code></h2>
+      <div class="two-col">
+        <div>
+          <h3>¿Qué es un <code>factory</code>?</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;">
+            Un constructor <code>factory</code> parece un constructor normal, pero internamente es un <strong style="color:var(--text);">método con control total</strong> sobre qué instancia retorna. Puede devolver:
+          </p>
+          <ul class="dart-list" style="margin-bottom:12px;">
+            <li>Una instancia <strong style="color:var(--text);">nueva</strong> (comportamiento habitual)</li>
+            <li>Una instancia <strong style="color:var(--text);">existente en caché</strong> (patrón singleton)</li>
+            <li>Una instancia de una <strong style="color:var(--text);">subclase</strong> según el contexto</li>
+          </ul>
+          <div class="card warn" style="margin-bottom:12px;">
+            <p style="font-size:12px;color:var(--yellow);margin-bottom:4px;">⚠ Lo que NO puede hacer</p>
+            <p style="font-size:12px;color:var(--muted);line-height:1.6;">Retornar <code>null</code>, un tipo incompatible, o acceder a <code>this</code> — porque el objeto puede no existir aún.</p>
+          </div>
+          <h3>Caso 1 — Deserialización JSON</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">El uso más frecuente en Flutter: parsear la respuesta de una API.</p>
+          <pre><span class="kw">class</span> <span class="ty">Producto</span> {
+  <span class="kw">final</span> <span class="ty">String</span> id, nombre<span class="op">;</span>
+  <span class="kw">final</span> <span class="ty">double</span> precio<span class="op">;</span>
+
+  <span class="ty">Producto</span>._({
+    <span class="kw">required this</span>.id,
+    <span class="kw">required this</span>.nombre,
+    <span class="kw">required this</span>.precio,
+  })<span class="op">;</span>
+
+  <span class="cm">// factory para JSON</span>
+  <span class="kw">factory</span> <span class="ty">Producto</span>.<span class="fn">fromJson</span>(<span class="ty">Map</span><span class="op">&lt;</span><span class="ty">String</span>, <span class="kw">dynamic</span><span class="op">&gt;</span> json) {
+    <span class="kw">return</span> <span class="ty">Producto</span>._(
+      id:     json[<span class="str">'id'</span>],
+      nombre: json[<span class="str">'nombre'</span>],
+      precio: (json[<span class="str">'precio'</span>] <span class="kw">as</span> <span class="ty">num</span>).<span class="fn">toDouble</span>()<span class="op">,</span>
+    )<span class="op">;</span>
+  }
+
+  <span class="ty">Map</span><span class="op">&lt;</span><span class="ty">String</span>, <span class="kw">dynamic</span><span class="op">&gt;</span> <span class="fn">toJson</span>() <span class="op">=></span>
+      {<span class="str">'id'</span>: id, <span class="str">'nombre'</span>: nombre, <span class="str">'precio'</span>: precio}<span class="op">;</span>
+}
+
+<span class="cm">// Uso típico con http</span>
+<span class="kw">final</span> p <span class="op">=</span> <span class="ty">Producto</span>.<span class="fn">fromJson</span>(<span class="fn">jsonDecode</span>(response.body))<span class="op">;</span></pre>
+        </div>
+        <div>
+          <h3>Caso 2 — Singleton (instancia única)</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            El <code>factory</code> guarda la instancia en un campo estático y la reutiliza. El operador <code>??=</code> asigna solo si el valor es <code>null</code>.
+          </p>
+          <pre><span class="kw">class</span> <span class="ty">Sesion</span> {
+  <span class="kw">static</span> <span class="ty">Sesion</span><span class="op">?</span> _instancia<span class="op">;</span>
+
+  <span class="cm">// Constructor privado</span>
+  <span class="ty">Sesion</span>.<span class="fn">_</span>()<span class="op">;</span>
+
+  <span class="kw">factory</span> <span class="ty">Sesion</span>.<span class="fn">obtener</span>() {
+    _instancia <span class="op">??=</span> <span class="ty">Sesion</span>.<span class="fn">_</span>()<span class="op">;</span> <span class="cm">// crea solo si es null</span>
+    <span class="kw">return</span> _instancia<span class="op">!;</span>
+  }
+}
+
+<span class="kw">var</span> s1 <span class="op">=</span> <span class="ty">Sesion</span>.<span class="fn">obtener</span>()<span class="op">;</span>
+<span class="kw">var</span> s2 <span class="op">=</span> <span class="ty">Sesion</span>.<span class="fn">obtener</span>()<span class="op">;</span>
+<span class="fn">print</span>(<span class="fn">identical</span>(s1, s2))<span class="op">;</span> <span class="cm">// true</span></pre>
+
+          <h3 style="margin-top:14px;">Caso 3 — Subclase según datos</h3>
+          <pre><span class="kw">abstract class</span> <span class="ty">Animal</span> {
+  <span class="kw">factory</span> <span class="ty">Animal</span>.<span class="fn">crear</span>(<span class="ty">String</span> tipo) {
+    <span class="kw">switch</span> (tipo) {
+      <span class="kw">case</span> <span class="str">'perro'</span>: <span class="kw">return</span> <span class="ty">Perro</span>()<span class="op">;</span>
+      <span class="kw">case</span> <span class="str">'gato'</span>:  <span class="kw">return</span> <span class="ty">Gato</span>()<span class="op">;</span>
+      <span class="kw">default</span>: <span class="kw">throw</span> <span class="ty">ArgumentError</span>(<span class="str">'Tipo desconocido'</span>)<span class="op">;</span>
+    }
+  }
+  <span class="kw">void</span> <span class="fn">hablar</span>()<span class="op">;</span>
+}
+
+<span class="kw">var</span> a <span class="op">=</span> <span class="ty">Animal</span>.<span class="fn">crear</span>(<span class="str">'perro'</span>)<span class="op">;</span>
+a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// ¡Guau!</span></pre>
+
+          <div class="card highlight" style="margin-top:12px;">
+            <p style="font-size:12px;color:var(--muted);margin-bottom:6px;">🔑 Cuándo usar cada uno</p>
+            <table style="font-size:11px;">
+              <tr><th>Situación</th><th>Usa</th></tr>
+              <tr><td>Inicializar con valores por defecto</td><td><code>Constructor nombrado</code></td></tr>
+              <tr><td>Parsear JSON / Map</td><td><code>factory fromJson</code></td></tr>
+              <tr><td>Reutilizar instancia en caché</td><td><code>factory</code></td></tr>
+              <tr><td>Decidir qué subclase instanciar</td><td><code>factory</code></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14: HERENCIA -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6 cont.</div>
+      <h2>Herencia, Abstract e Interface</h2>
+      <div class="two-col">
+        <div>
+          <h3>Herencia con extends</h3>
+          <pre><span class="kw">class</span> <span class="ty">Animal</span> {
+  <span class="ty">String</span> nombre<span class="op">;</span>
+  <span class="ty">Animal</span>(<span class="kw">this</span>.nombre)<span class="op">;</span>
+  <span class="kw">void</span> <span class="fn">hablar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="str">'...'</span>)<span class="op">;</span>
+}
+
+<span class="kw">class</span> <span class="ty">Perro</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+  <span class="ty">Perro</span>(<span class="ty">String</span> nombre) : <span class="kw">super</span>(nombre)<span class="op">;</span>
+
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="kw">void</span> <span class="fn">hablar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="str">'¡Guau!'</span>)<span class="op">;</span>
+}</pre>
+        </div>
+        <div>
+          <h3>Clases abstractas e interfaces</h3>
+          <pre><span class="cm">// Clase abstracta</span>
+<span class="kw">abstract class</span> <span class="ty">Figura</span> {
+  <span class="ty">double</span> <span class="fn">area</span>()<span class="op">;</span> <span class="cm">// método abstracto</span>
+}
+
+<span class="kw">class</span> <span class="ty">Circulo</span> <span class="kw">extends</span> <span class="ty">Figura</span> {
+  <span class="ty">double</span> radio<span class="op">;</span>
+  <span class="ty">Circulo</span>(<span class="kw">this</span>.radio)<span class="op">;</span>
+
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="ty">double</span> <span class="fn">area</span>() <span class="op">=></span> <span class="num">3.14159</span> <span class="op">*</span> radio <span class="op">*</span> radio<span class="op">;</span>
+}
+
+<span class="cm">// Mixin (reutilización sin herencia)</span>
+<span class="kw">mixin</span> <span class="ty">Volador</span> {
+  <span class="kw">void</span> <span class="fn">volar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="str">'Volando!'</span>)<span class="op">;</span>
+}
+<span class="kw">class</span> <span class="ty">Pato</span> <span class="kw">extends</span> <span class="ty">Animal</span> <span class="kw">with</span> <span class="ty">Volador</span> {
+  <span class="ty">Pato</span>() : <span class="kw">super</span>(<span class="str">'Pato'</span>)<span class="op">;</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- EJ S3: EJERCICIOS SESIÓN 3 -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Ejercicios</div>
+      <h2>Ejercicios — Sesión 3</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 1</span><span class="ex-title">Agenda de contactos</span><span class="badge blue">Map · List</span></div>
+          <p class="ex-body">Practica el uso de <code>Map</code> y <code>List</code> para almacenar y consultar datos.</p>
+          <ol class="ex-steps">
+            <li>Crea un <code>Map&lt;String, String&gt;</code> con 5 pares nombre→teléfono</li>
+            <li>Recórrelo con <code>.forEach()</code> e imprime cada entrada</li>
+            <li>Busca un contacto por nombre y muestra su teléfono (o "No encontrado")</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 2</span><span class="ex-title">Clase Rectángulo</span><span class="badge blue">OOP · Clases</span></div>
+          <p class="ex-body">Diseña una clase completa con constructor, propiedades y métodos.</p>
+          <ol class="ex-steps">
+            <li>Crea clase <code>Rectangulo</code> con <code>double ancho</code> y <code>double alto</code></li>
+            <li>Agrega métodos <code>area()</code> y <code>perimetro()</code></li>
+            <li>Agrega método <code>esCuadrado()</code> que retorne <code>bool</code></li>
+            <li>Sobrescribe <code>toString()</code> para mostrar info del rectángulo</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 3</span><span class="ex-title">Jerarquía de figuras</span><span class="badge blue">Herencia · Abstract</span></div>
+          <p class="ex-body">Usa clases abstractas y herencia para modelar diferentes figuras geométricas.</p>
+          <ol class="ex-steps">
+            <li>Crea <code>abstract class Figura</code> con método abstracto <code>area()</code></li>
+            <li>Implementa <code>Circulo</code>, <code>Triangulo</code> y <code>Cuadrado</code> que extiendan <code>Figura</code></li>
+            <li>Crea una <code>List&lt;Figura&gt;</code> con instancias de cada tipo</li>
+            <li>Itera la lista imprimiendo el tipo y su área</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 4</span><span class="ex-title">Filtrar colecciones</span><span class="badge blue">List · Métodos funcionales</span></div>
+          <p class="ex-body">Practica <code>where</code>, <code>map</code> y <code>reduce</code> sobre listas de datos reales.</p>
+          <ol class="ex-steps">
+            <li>Crea <code>List&lt;double&gt; calificaciones = [85, 92, 61, 78, 95, 55, 88]</code></li>
+            <li>Filtra las calificaciones mayores a 80 con <code>.where()</code></li>
+            <li>Calcula el promedio total con <code>.reduce()</code></li>
+            <li>Imprime ambos resultados</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 5</span><span class="ex-title">Sistema de Estudiantes</span><span class="badge yellow">Integrador S3</span></div>
+          <p class="ex-body">Aplica: clases, herencia, colecciones y OOP completo en un sistema cohesivo.</p>
+          <ol class="ex-steps">
+            <li>Crea clase abstracta <code>Persona</code> con nombre, edad y método <code>info()</code></li>
+            <li>Crea <code>Estudiante extends Persona</code> con matrícula y lista de calificaciones</li>
+            <li>Agrega método <code>promedio()</code> usando <code>.reduce()</code></li>
+            <li>Crea un <code>Map&lt;String, Estudiante&gt;</code> con 3 estudiantes</li>
+            <li><strong>Bonus:</strong> filtra estudiantes con promedio &gt; 8.0 e imprímelos</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15: SESIÓN 4 HEADER -->
+    <div class="slide slide-hero">
+      <div class="tag">Sesión 4</div>
+      <h1>Async y <span>Manejo de Errores</span></h1>
+      <p class="subtitle">Programación asíncrona con Future y async/await.<br>El punto más importante del módulo.</p>
+      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
+        <span class="badge red">⚠ Punto de quiebre — dedicar tiempo extra</span>
+      </div>
+    </div>
+
+    <!-- 14: ASYNC -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 4 · Tema 7</div>
+      <h2>Programación Asíncrona</h2>
+      <div class="two-col">
+        <div>
+          <h3>Future — promesa de un valor</h3>
+          <pre><span class="cm">// Función que tarda (simula red/disco)</span>
+<span class="ty">Future</span><span class="op">&lt;</span><span class="ty">String</span><span class="op">&gt;</span> <span class="fn">obtenerDatos</span>() <span class="kw">async</span> {
+  <span class="kw">await</span> <span class="ty">Future</span>.<span class="fn">delayed</span>(<span class="ty">Duration</span>(seconds: <span class="num">2</span>))<span class="op">;</span>
+  <span class="kw">return</span> <span class="str">'Datos recibidos'</span><span class="op">;</span>
+}
+
+<span class="cm">// Cómo consumirla</span>
+<span class="kw">void</span> <span class="fn">main</span>() <span class="kw">async</span> {
+  <span class="fn">print</span>(<span class="str">'Esperando...'</span>)<span class="op">;</span>
+  <span class="kw">var</span> resultado <span class="op">=</span> <span class="kw">await</span> <span class="fn">obtenerDatos</span>()<span class="op">;</span>
+  <span class="fn">print</span>(resultado)<span class="op">;</span>
+}</pre>
+        </div>
+        <div>
+          <h3>Stream — flujo de valores</h3>
+          <pre><span class="cm">// Stream: múltiples valores en el tiempo</span>
+<span class="ty">Stream</span><span class="op">&lt;</span><span class="ty">int</span><span class="op">&gt;</span> <span class="fn">conteo</span>() <span class="kw">async*</span> {
+  <span class="kw">for</span> (<span class="kw">var</span> i <span class="op">=</span> <span class="num">1</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="num">5</span><span class="op">;</span> i<span class="op">++</span>) {
+    <span class="kw">await</span> <span class="ty">Future</span>.<span class="fn">delayed</span>(<span class="ty">Duration</span>(seconds: <span class="num">1</span>))<span class="op">;</span>
+    <span class="kw">yield</span> i<span class="op">;</span>
+  }
+}
+
+<span class="cm">// Escuchar el stream</span>
+<span class="kw">await for</span> (<span class="kw">var</span> n <span class="kw">in</span> <span class="fn">conteo</span>()) {
+  <span class="fn">print</span>(n)<span class="op">;</span>
+}</pre>
+          <div class="card highlight" style="margin-top:12px;">
+            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 En Flutter, los Streams alimentan widgets como <code>StreamBuilder</code>. Entender esto es clave.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15: ERROR HANDLING -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 4 · Tema 8</div>
+      <h2>Manejo de Errores</h2>
+      <div class="two-col">
+        <div>
+          <h3>try / catch / finally</h3>
+          <pre><span class="kw">try</span> {
+  <span class="kw">var</span> resultado <span class="op">=</span> <span class="num">10</span> <span class="op">~/</span> <span class="num">0</span><span class="op">;</span>
+} <span class="kw">on</span> <span class="ty">IntegerDivisionByZeroException</span> {
+  <span class="fn">print</span>(<span class="str">'División por cero'</span>)<span class="op">;</span>
+} <span class="kw">catch</span> (e, stackTrace) {
+  <span class="fn">print</span>(<span class="str">'Error: </span><span class="op">$</span>e<span class="str">'</span>)<span class="op">;</span>
+} <span class="kw">finally</span> {
+  <span class="fn">print</span>(<span class="str">'Siempre se ejecuta'</span>)<span class="op">;</span>
+}</pre>
+          <h3 style="margin-top:14px;">Excepciones personalizadas</h3>
+          <pre><span class="kw">class</span> <span class="ty">SaldoInsuficienteException</span> <span class="kw">implements</span> <span class="ty">Exception</span> {
+  <span class="ty">String</span> mensaje<span class="op">;</span>
+  <span class="ty">SaldoInsuficienteException</span>(<span class="kw">this</span>.mensaje)<span class="op">;</span>
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="ty">String</span> <span class="fn">toString</span>() <span class="op">=></span> mensaje<span class="op">;</span>
+}</pre>
+        </div>
+        <div>
+          <h3>async con manejo de errores</h3>
+          <pre><span class="ty">Future</span><span class="op">&lt;</span><span class="kw">void</span><span class="op">&gt;</span> <span class="fn">cargarUsuario</span>() <span class="kw">async</span> {
+  <span class="kw">try</span> {
+    <span class="kw">var</span> datos <span class="op">=</span> <span class="kw">await</span> <span class="fn">obtenerDatos</span>()<span class="op">;</span>
+    <span class="fn">print</span>(datos)<span class="op">;</span>
+  } <span class="kw">catch</span> (e) {
+    <span class="fn">print</span>(<span class="str">'Error al cargar: </span><span class="op">$</span>e<span class="str">'</span>)<span class="op">;</span>
+  }
+}</pre>
+          <div class="card warn" style="margin-top:12px;">
+            <h3 style="color:var(--yellow);margin-bottom:8px;">Errores comunes de alumnos</h3>
+            <ul class="dart-list">
+              <li>Olvidar <code>async</code> en la función que usa <code>await</code></li>
+              <li>No manejar errores de Futures que pueden fallar</li>
+              <li>Confundir <code>throw</code> con <code>return</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EJ S4: EJERCICIOS SESIÓN 4 -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 4 · Ejercicios</div>
+      <h2>Ejercicios — Sesión 4</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 1</span><span class="ex-title">Future básico</span><span class="badge blue">Async · Await</span></div>
+          <p class="ex-body">Crea y consume tu primer <code>Future</code> con <code>async/await</code>.</p>
+          <ol class="ex-steps">
+            <li>Crea función <code>Future&lt;String&gt; obtenerMensaje()</code> con un delay de 2 segundos</li>
+            <li>En <code>main()</code> espera el resultado con <code>await</code> e imprímelo</li>
+            <li><strong>Bonus:</strong> agrega un <code>print()</code> antes del await — ¿qué se imprime primero?</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 2</span><span class="ex-title">Manejo de errores async</span><span class="badge blue">Try/Catch · Future</span></div>
+          <p class="ex-body">Combina <code>async/await</code> con <code>try/catch</code> para manejar fallos en operaciones asíncronas.</p>
+          <ol class="ex-steps">
+            <li>Crea función que simule una llamada a API: lanza excepción si un flag es <code>true</code></li>
+            <li>En <code>main()</code>, envuelve la llamada en <code>try/catch/finally</code></li>
+            <li>Imprime el error capturado y un mensaje en el bloque <code>finally</code></li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 3</span><span class="ex-title">Excepción personalizada</span><span class="badge blue">Excepciones · OOP</span></div>
+          <p class="ex-body">Diseña una jerarquía de excepciones propias para un sistema de validación.</p>
+          <ol class="ex-steps">
+            <li>Crea <code>class ValidacionException implements Exception</code> con mensaje</li>
+            <li>Crea función <code>validarEdad(int edad)</code> que lance la excepción si edad &lt; 18</li>
+            <li>Captura la excepción en <code>main()</code> e imprime el mensaje</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 4</span><span class="ex-title">Stream de datos</span><span class="badge blue">Stream · async*</span></div>
+          <p class="ex-body">Crea y consume un Stream que emita valores con intervalos de tiempo.</p>
+          <ol class="ex-steps">
+            <li>Crea función <code>Stream&lt;int&gt; contador(int hasta)</code> con <code>async*</code></li>
+            <li>Cada valor se emite con delay de 1 segundo usando <code>yield</code></li>
+            <li>Consúmelo con <code>await for</code> e imprime cada número</li>
+          </ol>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header"><span class="ex-num">EJ 5</span><span class="ex-title">Simulador de Banco</span><span class="badge yellow">Integrador S4</span></div>
+          <p class="ex-body">Aplica async, excepciones personalizadas, clases y OOP en un proyecto integrador.</p>
+          <ol class="ex-steps">
+            <li>Clase <code>CuentaBancaria</code> con saldo, titular y lista de movimientos</li>
+            <li>Métodos <code>depositar</code> y <code>retirar</code> <code>async</code> (simular delay)</li>
+            <li>Lanza <code>SaldoInsuficienteException</code> si no hay fondos suficientes</li>
+            <li>Maneja errores con <code>try/catch</code> en <code>main()</code></li>
+            <li>Imprime el historial de movimientos al final</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROYECTO FINAL -->
+    <div class="slide slide-content">
+      <div class="tag">Proyecto Final · Módulo 01</div>
+      <h2>Proyecto Integrador — Dart Fundamentals</h2>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card highlight">
+          <p style="font-size:13px;line-height:1.7;color:var(--text);">🎯 <strong style="color:var(--dart);">Objetivo:</strong> Construir un sistema completo que integre <em>todos</em> los temas del módulo en un solo proyecto cohesivo y funcional. Deberás usar: variables, tipos, null safety, funciones, colecciones, OOP, async y manejo de errores.</p>
+        </div>
+        <div class="exercise">
+          <div class="exercise-header">
+            <span class="ex-num">PROYECTO</span>
+            <span class="ex-title">Sistema de Gestión de Tareas Async</span>
+            <span class="badge red">Integrador · Todo el Módulo</span>
+          </div>
+          <p class="ex-body">Un gestor de tareas con persistencia simulada, categorías, prioridades y operaciones asíncronas.</p>
+          <ol class="ex-steps">
+            <li>Clase abstracta <code>Elemento</code> con id, titulo y método abstracto <code>info()</code></li>
+            <li>Clase <code>Tarea extends Elemento</code> con prioridad (enum), estado (bool) y fecha límite nullable</li>
+            <li>Clase <code>GestorTareas</code> con <code>Map&lt;String, Tarea&gt;</code> y métodos <code>async</code> para agregar/eliminar (simular red)</li>
+            <li>Excepción personalizada <code>TareaNoEncontradaException</code></li>
+            <li>Función que filtre tareas por prioridad usando <code>.where()</code></li>
+            <li>Función que ordene por fecha límite usando null safety (<code>??</code> con fecha lejana)</li>
+            <li>En <code>main()</code>, maneja todo con <code>try/catch/finally</code> y muestra el resumen final</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /slides -->
+
+  <!-- BOTTOM NAV -->
+  <div id="bottom">
+    <button class="btn btn-ghost" id="prev" onclick="navigate(-1)">← Anterior</button>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <span id="slide-dots" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
+    </div>
+    <button class="btn btn-primary" id="next" onclick="navigate(1)">Siguiente →</button>
+  </div>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const pills = document.querySelectorAll('.nav-pill');
+  const total = slides.length;
+  let current = 0;
+
+  function go(idx) {
+    slides[current].classList.remove('active');
+    pills[current].classList.remove('active');
+    current = Math.max(0, Math.min(total - 1, idx));
+    slides[current].classList.add('active');
+    pills[current].classList.add('active');
+    pills[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === total - 1;
+    document.getElementById('next').textContent = current === total - 1 ? '✓ Fin' : 'Siguiente →';
+  }
+
+  function navigate(dir) { go(current + dir); }
+
+  pills.forEach((p, i) => p.addEventListener('click', () => go(i)));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+  });
+
+  let isDark = true;
+  function toggleTheme() {
+    isDark = !isDark;
+    document.body.classList.toggle('light-mode', !isDark);
+    document.getElementById('themeBtn').querySelector('.toggle-icon').textContent = isDark ? '🌙' : '☀️';
+    document.getElementById('themeLabel').textContent = isDark ? 'Oscuro' : 'Claro';
+  }
+
+  go(0);
+</script>
+</body>
+</html>
