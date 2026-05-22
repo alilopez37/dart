@@ -5,242 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dart Fundamentals — Módulo 01</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0e1a;
-    --surface: #111827;
-    --surface2: #1a2235;
-    --border: #1e3a5f;
-    --blue: #00d4ff;
-    --blue2: #0090d4;
-    --dart: #54c5f8;
-    --accent: #ff6b6b;
-    --green: #4ade80;
-    --yellow: #fbbf24;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --code-bg: #0d1117;
-  }
-  body.light-mode {
-    --bg: #f0f4f8;
-    --surface: #ffffff;
-    --surface2: #e8edf5;
-    --border: #b0c4de;
-    --blue: #0070c0;
-    --blue2: #005fa3;
-    --dart: #0090cc;
-    --accent: #e03030;
-    --green: #16a34a;
-    --yellow: #d97706;
-    --text: #1a2235;
-    --muted: #4a5568;
-    --code-bg: #f8fafc;
-  }
-
-  /* THEME TOGGLE */
-  .theme-toggle {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 20px; padding: 4px 10px; cursor: pointer;
-    font-size: 12px; font-weight: 600; color: var(--muted);
-    transition: all .2s; user-select: none;
-  }
-  .theme-toggle:hover { border-color: var(--blue); color: var(--blue); }
-  .toggle-icon { font-size: 14px; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  /* LAYOUT */
-  #app { display: flex; flex-direction: column; height: 100vh; }
-
-  /* TOPBAR */
-  #topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 24px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-dot {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--blue), var(--blue2));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: #fff;
-  }
-  .logo-text { font-size: 13px; font-weight: 600; color: var(--dart); letter-spacing: .5px; }
-  .progress-wrap { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
-  .progress-bar { width: 160px; height: 4px; background: var(--border); border-radius: 2px; }
-  .progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), var(--dart)); transition: width .4s; }
-  .slide-counter { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
-
-  /* NAV PILLS */
-  #nav { display: flex; gap: 4px; padding: 8px 24px; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
-  .nav-pill {
-    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    border: 1px solid var(--border); color: var(--muted); cursor: pointer;
-    white-space: nowrap; transition: all .2s;
-  }
-  .nav-pill:hover { border-color: var(--blue); color: var(--blue); }
-  .nav-pill.active { background: var(--blue); color: #000; border-color: var(--blue); }
-
-  /* SLIDES CONTAINER */
-  #slides { flex: 1; overflow: hidden; position: relative; }
-  .slide {
-    position: absolute; inset: 0;
-    display: none; flex-direction: column;
-    padding: 32px 40px; overflow-y: auto;
-    animation: slideIn .3s ease;
-  }
-  .slide.active { display: flex; }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* SLIDE TYPES */
-  .slide-hero { justify-content: center; align-items: center; text-align: center; }
-  .slide-content { gap: 20px; }
-
-  /* TYPOGRAPHY */
-  .tag {
-    display: inline-block; padding: 3px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-    background: rgba(0,212,255,.12); color: var(--blue); border: 1px solid rgba(0,212,255,.25);
-    margin-bottom: 12px;
-  }
-  h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 700; line-height: 1.1; }
-  h1 span { color: var(--dart); }
-  h2 { font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--dart); }
-  h3 { font-size: 16px; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
-  .subtitle { font-size: 16px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
-
-  /* GRID */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-
-  /* CARDS */
-  .card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px;
-  }
-  .card.highlight { border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.05); }
-  .card.warn { border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.05); }
-  .card.good { border-color: rgba(74,222,128,.35); background: rgba(74,222,128,.05); }
-
-  /* CODE */
-  pre, code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-  }
-  pre {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    overflow-x: auto;
-    line-height: 1.7;
-  }
-  .kw { color: #ff79c6; }
-  .ty { color: var(--dart); }
-  .str { color: #f1fa8c; }
-  .cm { color: #6272a4; font-style: italic; }
-  .fn { color: #50fa7b; }
-  .nm { color: #bd93f9; }
-  .op { color: #ff79c6; }
-  .num { color: #bd93f9; }
-  body.light-mode .kw { color: #d6336c; }
-  body.light-mode .str { color: #2d8000; }
-  body.light-mode .cm { color: #6a737d; }
-  body.light-mode .fn { color: #005cc5; }
-  body.light-mode .nm { color: #6f42c1; }
-  body.light-mode .op { color: #d6336c; }
-  body.light-mode .num { color: #6f42c1; }
-
-  /* BADGE */
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
-  }
-  .badge.blue { background: rgba(0,212,255,.15); color: var(--blue); }
-  .badge.green { background: rgba(74,222,128,.15); color: var(--green); }
-  .badge.yellow { background: rgba(251,191,36,.15); color: var(--yellow); }
-  .badge.red { background: rgba(255,107,107,.15); color: var(--accent); }
-
-  /* LIST */
-  ul.dart-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  ul.dart-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
-  ul.dart-list li::before { content: '▸'; color: var(--blue); flex-shrink: 0; margin-top: 1px; }
-
-  /* EXERCISE */
-  .exercise {
-    background: var(--surface2); border: 1px solid rgba(251,191,36,.3);
-    border-radius: 12px; padding: 20px;
-  }
-  .exercise-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .ex-num { font-size: 11px; font-weight: 700; background: var(--yellow); color: #000; padding: 2px 8px; border-radius: 4px; }
-  .ex-title { font-size: 15px; font-weight: 600; }
-  .ex-body { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
-  .ex-steps { font-size: 13px; color: var(--text); line-height: 1.7; }
-  .ex-steps li { margin-left: 16px; margin-bottom: 4px; }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--border); margin: 4px 0; }
-
-  /* TABLE */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { background: var(--surface2); color: var(--dart); font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
-  td { padding: 9px 14px; border-bottom: 1px solid rgba(30,58,95,.5); color: var(--text); }
-  tr:last-child td { border-bottom: none; }
-  td code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
-
-  /* BOTTOM NAV */
-  #bottom {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 24px;
-    background: var(--surface); border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .btn {
-    padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
-    cursor: pointer; border: none; font-family: 'Space Grotesk', sans-serif;
-    transition: all .2s; display: flex; align-items: center; gap: 6px;
-  }
-  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
-  .btn-primary { background: var(--blue); color: #000; }
-  .btn-primary:hover { background: var(--dart); }
-  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-  /* SESSION BADGES */
-  .session-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
-
-  /* HERO elements */
-  .hero-logo {
-    width: 80px; height: 80px; border-radius: 24px;
-    background: linear-gradient(135deg, #0090d4, #54c5f8);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 36px; margin: 0 auto 20px;
-    box-shadow: 0 0 60px rgba(0,212,255,.25);
-  }
-  .topic-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-    width: 100%; max-width: 560px; margin-top: 20px;
-  }
-  .topic-item {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 14px;
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13px; font-weight: 500;
-  }
-  .topic-num { color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-</style>
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <div id="app">
@@ -248,6 +13,7 @@
   <!-- TOPBAR -->
   <div id="topbar">
     <div class="logo">
+      <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
       <div class="logo-dot">D</div>
       <div class="logo-text">DART FUNDAMENTALS — Módulo 01</div>
     </div>
@@ -258,38 +24,70 @@
     </div>
   </div>
 
-  <!-- NAV PILLS -->
-  <div id="nav">
-    <div class="nav-pill active" data-slide="0">Intro</div>
-    <div class="nav-pill" data-slide="1">Sesión 1</div>
-    <div class="nav-pill" data-slide="2">Sintaxis</div>
-    <div class="nav-pill" data-slide="3">Tipos</div>
-    <div class="nav-pill" data-slide="4">Null Safety</div>
-    <div class="nav-pill" data-slide="5">Ejercicios S1</div>
-    <div class="nav-pill" data-slide="6">Sesión 2</div>
-    <div class="nav-pill" data-slide="7">Operadores</div>
-    <div class="nav-pill" data-slide="8">Funciones</div>
-    <div class="nav-pill" data-slide="9">Control Flow</div>
-    <div class="nav-pill" data-slide="10">Ejercicios S2</div>
-    <div class="nav-pill" data-slide="11">Sesión 3</div>
-    <div class="nav-pill" data-slide="12">Colecciones</div>
-    <div class="nav-pill" data-slide="13">OOP</div>
-    <div class="nav-pill" data-slide="14">Constructores</div>
-    <div class="nav-pill" data-slide="15">Factory</div>
-    <div class="nav-pill" data-slide="16">Herencia</div>
-    <div class="nav-pill" data-slide="17">Ejercicios S3</div>
-    <div class="nav-pill" data-slide="18">Sesión 4</div>
-    <div class="nav-pill" data-slide="19">Async</div>
-    <div class="nav-pill" data-slide="20">Errores</div>
-    <div class="nav-pill" data-slide="21">Ejercicios S4</div>
-    <div class="nav-pill" data-slide="22">Proyecto Final</div>
-  </div>
+  <div class="main-wrapper">
+    <!-- SIDEBAR NAV -->
+    <div id="nav">
+      <div class="nav-pill active" data-slide="0">🏠 Intro</div>
+      
+      <div class="nav-group">
+        <div class="nav-group-title">Módulo I</div>
+        <div class="nav-pill" data-slide="1">📌 Sesión 1</div>
+        <div class="nav-submenu">
+          <div class="nav-pill" data-slide="2">Sintaxis</div>
+          <div class="nav-pill" data-slide="3">Tipos de datos</div>
+          <div class="nav-pill" data-slide="4">Null Safety</div>
+          <div class="nav-pill" data-slide="5">Ejercicios S1</div>
+        </div>
+      </div>
 
-  <!-- SLIDES -->
-  <div id="slides">
+      <div class="nav-group">
+        <div class="nav-pill" data-slide="6">📌 Sesión 2</div>
+        <div class="nav-submenu">
+          <div class="nav-pill" data-slide="7">Operadores</div>
+          <div class="nav-pill" data-slide="8">Funciones</div>
+          <div class="nav-pill" data-slide="9">Control Flow</div>
+          <div class="nav-pill" data-slide="10">Ejercicios S2</div>
+        </div>
+      </div>
 
-    <!-- 0: HERO -->
-    <div class="slide slide-hero active">
+      <div class="nav-group">
+        <div class="nav-pill" data-slide="11">📌 Sesión 3</div>
+        <div class="nav-submenu">
+          <div class="nav-pill" data-slide="12">Colecciones</div>
+          <div class="nav-pill" data-slide="13">OOP Básica</div>
+          <div class="nav-pill" data-slide="14">Constructores</div>
+          <div class="nav-pill" data-slide="15">Factory</div>
+          <div class="nav-pill" data-slide="16">Herencia</div>
+          <div class="nav-pill" data-slide="17">Ejercicios S3</div>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-pill" data-slide="18">📌 Sesión 4</div>
+        <div class="nav-submenu">
+          <div class="nav-pill" data-slide="19">Async / Await</div>
+          <div class="nav-pill" data-slide="20">Errores</div>
+          <div class="nav-pill" data-slide="21">Ejercicios S4</div>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-pill" data-slide="22">🏆 Proyecto Final</div>
+      </div>
+    </div>
+
+    <!-- BOTONES FLOTANTES -->
+    <div class="fab-container">
+      <button class="btn-fab" onclick="adjustFont(1)" title="Aumentar letra">A+</button>
+      <button class="btn-fab" onclick="adjustFont(-1)" title="Disminuir letra">A-</button>
+    </div>
+
+    <div class="content-view">
+      <!-- SLIDES -->
+      <div id="slides">
+
+        <!-- 0: HERO -->
+        <div class="slide slide-hero active">
       <div class="hero-logo">🎯</div>
       <div class="tag">Módulo 01</div>
       <h1>Dart <span>Fundamentals</span></h1>
@@ -304,7 +102,7 @@
         <div class="topic-item"><span class="topic-num">07</span> Programación Async</div>
         <div class="topic-item"><span class="topic-num">08</span> Manejo de Errores</div>
       </div>
-      <p style="margin-top:24px;font-size:12px;color:var(--muted);">Herramienta: <strong style="color:var(--dart);">dartpad.dev</strong> — sin instalación necesaria</p>
+      <p style="margin-top:24px;color:var(--muted);">Herramienta: <strong style="color:var(--dart);">dartpad.dev</strong> — sin instalación necesaria</p>
     </div>
 
     <!-- 1: SESIÓN 1 HEADER -->
@@ -346,7 +144,7 @@
 /// Documentación (DartDoc)</span></pre>
           <div class="card warn" style="margin-top:14px;">
             <h3 style="color:var(--yellow);margin-bottom:6px;">💡 Tip para clase</h3>
-            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Pide que escriban <em>su propio</em> "Hola Mundo" modificando el texto. Primer éxito = primera motivación.</p>
+            <p style="color:var(--muted);line-height:1.6;">Pide que escriban <em>su propio</em> "Hola Mundo" modificando el texto. Primer éxito = primera motivación.</p>
           </div>
         </div>
       </div>
@@ -384,8 +182,8 @@
             <tr><td><code>Map</code></td><td><code>{'k':v}</code></td><td>Clave-valor</td><td>Variable (heap)</td></tr>
           </table>
           <div class="card good" style="margin-top:12px;">
-            <p style="font-size:12px;color:var(--green);">✓ <strong>var vs final vs const</strong></p>
-            <p style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;"><code>var</code> puede cambiar · <code>final</code> se asigna una vez · <code>const</code> valor fijo en compilación</p>
+            <p style="color:var(--green);">✓ <strong>var vs final vs const</strong></p>
+            <p style="color:var(--muted);margin-top:4px;line-height:1.5;"><code>var</code> puede cambiar · <code>final</code> se asigna una vez · <code>const</code> valor fijo en compilación</p>
           </div>
         </div>
       </div>
@@ -396,7 +194,7 @@
       <div class="tag">Sesión 1 · Null Safety</div>
       <h2>Null Safety — El superpoder de Dart</h2>
       <div class="card highlight" style="margin-bottom:14px;">
-        <p style="font-size:13px;line-height:1.7;color:var(--text);">
+        <p style="line-height:1.7;color:var(--text);">
           <strong style="color:var(--dart);">¿Qué es Null Safety?</strong> Es un sistema que garantiza en tiempo de <em>compilación</em> que ninguna variable no-nullable pueda contener <code>null</code>. Dart introduce esto para eliminar el famoso <em>"Null Pointer Exception"</em> que afecta a lenguajes como Java o JavaScript. Con null safety, si intentas usar una variable que podría ser <code>null</code> sin comprobarlo antes, el compilador lanza un error — no tu app en producción.
         </p>
       </div>
@@ -433,7 +231,7 @@ ciudad <span class="op">??=</span> <span class="str">'Ciudad de México'</span><
 ciudad <span class="op">??=</span> <span class="str">'Guadalajara'</span><span class="op">;</span>
 <span class="fn">print</span>(ciudad)<span class="op">;</span> <span class="cm">// Ciudad de México (no cambia)</span></pre>
           <div class="card highlight" style="margin-top:12px;">
-            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 Null safety elimina una de las fuentes de errores más comunes en programación.</p>
+            <p style="line-height:1.6;color:var(--muted);">🔑 Null safety elimina una de las fuentes de errores más comunes en programación.</p>
           </div>
         </div>
       </div>
@@ -811,14 +609,14 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
       <div class="two-col">
         <div>
           <h3>¿Por qué existen?</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px;">
+          <p style="color:var(--muted);line-height:1.7;margin-bottom:12px;">
             Dart <strong style="color:var(--text);">no permite sobrecarga</strong> de constructores por firma (como Java o C++). Los constructores nombrados son la solución: permiten múltiples formas de crear un objeto, cada una con semántica clara y explícita.
           </p>
           <div class="card highlight" style="margin-bottom:12px;">
-            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 Sintaxis: <code>NombreClase.nombreConstructor(...)</code> — el punto separa la clase del constructor.</p>
+            <p style="line-height:1.6;color:var(--muted);">🔑 Sintaxis: <code>NombreClase.nombreConstructor(...)</code> — el punto separa la clase del constructor.</p>
           </div>
           <h3>Lista de inicialización</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">
             El <code>:</code> tras los parámetros inicia la <em>initializer list</em>: se ejecuta antes del cuerpo del constructor y permite asignar campos <code>final</code>.
           </p>
           <pre><span class="kw">class</span> <span class="ty">Punto</span> {
@@ -846,7 +644,7 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
         </div>
         <div>
           <h3>Redirección de constructores</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">
             Un constructor puede delegar en otro del mismo objeto usando <code>: this(...)</code>. Evita duplicar lógica.
           </p>
           <pre><span class="kw">class</span> <span class="ty">Rectangulo</span> {
@@ -862,7 +660,7 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
 <span class="cm">// ancho: 5.0, alto: 5.0</span></pre>
 
           <h3 style="margin-top:14px;">Constructores <code>const</code> nombrados</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">
             Si todos los campos son <code>final</code> y los valores son constantes en tiempo de compilación, Dart <strong style="color:var(--text);">canonicaliza</strong> la instancia: dos llamadas con los mismos valores devuelven <em>el mismo objeto en memoria</em>.
           </p>
           <pre><span class="kw">class</span> <span class="ty">Borde</span> {
@@ -876,12 +674,12 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
 <span class="kw">const</span> b <span class="op">=</span> <span class="ty">Borde</span>.<span class="fn">circular</span>()<span class="op">;</span>
 <span class="fn">print</span>(<span class="fn">identical</span>(a, b))<span class="op">;</span> <span class="cm">// true → mismo objeto</span></pre>
           <div class="card good" style="margin-top:12px;">
-            <p style="font-size:12px;color:var(--green);margin-bottom:4px;">✓ Flutter usa esto masivamente</p>
-            <p style="font-size:12px;color:var(--muted);line-height:1.6;"><code>EdgeInsets.all()</code> · <code>BorderRadius.circular()</code> · <code>SizedBox.shrink()</code> — todos son constructores nombrados <code>const</code>.</p>
+            <p style="color:var(--green);margin-bottom:4px;">✓ Flutter usa esto masivamente</p>
+            <p style="color:var(--muted);line-height:1.6;"><code>EdgeInsets.all()</code> · <code>BorderRadius.circular()</code> · <code>SizedBox.shrink()</code> — todos son constructores nombrados <code>const</code>.</p>
           </div>
           <div class="card warn" style="margin-top:10px;">
-            <p style="font-size:12px;color:var(--yellow);margin-bottom:4px;">⚠ Regla de diseño</p>
-            <p style="font-size:12px;color:var(--muted);line-height:1.6;">Un constructor nombrado <strong style="color:var(--text);">siempre retorna una nueva instancia</strong> de la clase. Si necesitas control total (retornar instancia existente, subclase, etc.) → usa <code>factory</code>.</p>
+            <p style="color:var(--yellow);margin-bottom:4px;">⚠ Regla de diseño</p>
+            <p style="color:var(--muted);line-height:1.6;">Un constructor nombrado <strong style="color:var(--text);">siempre retorna una nueva instancia</strong> de la clase. Si necesitas control total (retornar instancia existente, subclase, etc.) → usa <code>factory</code>.</p>
           </div>
         </div>
       </div>
@@ -894,7 +692,7 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
       <div class="two-col">
         <div>
           <h3>¿Qué es un <code>factory</code>?</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;">
+          <p style="color:var(--muted);line-height:1.7;margin-bottom:10px;">
             Un constructor <code>factory</code> parece un constructor normal, pero internamente es un <strong style="color:var(--text);">método con control total</strong> sobre qué instancia retorna. Puede devolver:
           </p>
           <ul class="dart-list" style="margin-bottom:12px;">
@@ -903,11 +701,11 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
             <li>Una instancia de una <strong style="color:var(--text);">subclase</strong> según el contexto</li>
           </ul>
           <div class="card warn" style="margin-bottom:12px;">
-            <p style="font-size:12px;color:var(--yellow);margin-bottom:4px;">⚠ Lo que NO puede hacer</p>
-            <p style="font-size:12px;color:var(--muted);line-height:1.6;">Retornar <code>null</code>, un tipo incompatible, o acceder a <code>this</code> — porque el objeto puede no existir aún.</p>
+            <p style="color:var(--yellow);margin-bottom:4px;">⚠ Lo que NO puede hacer</p>
+            <p style="color:var(--muted);line-height:1.6;">Retornar <code>null</code>, un tipo incompatible, o acceder a <code>this</code> — porque el objeto puede no existir aún.</p>
           </div>
           <h3>Caso 1 — Deserialización JSON</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">El uso más frecuente en Flutter: parsear la respuesta de una API.</p>
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">El uso más frecuente en Flutter: parsear la respuesta de una API.</p>
           <pre><span class="kw">class</span> <span class="ty">Producto</span> {
   <span class="kw">final</span> <span class="ty">String</span> id, nombre<span class="op">;</span>
   <span class="kw">final</span> <span class="ty">double</span> precio<span class="op">;</span>
@@ -936,7 +734,7 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
         </div>
         <div>
           <h3>Caso 2 — Singleton (instancia única)</h3>
-          <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">
             El <code>factory</code> guarda la instancia en un campo estático y la reutiliza. El operador <code>??=</code> asigna solo si el valor es <code>null</code>.
           </p>
           <pre><span class="kw">class</span> <span class="ty">Sesion</span> {
@@ -1133,7 +931,7 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
   <span class="fn">print</span>(n)<span class="op">;</span>
 }</pre>
           <div class="card highlight" style="margin-top:12px;">
-            <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 En Flutter, los Streams alimentan widgets como <code>StreamBuilder</code>. Entender esto es clave.</p>
+            <p style="line-height:1.6;color:var(--muted);">🔑 En Flutter, los Streams alimentan widgets como <code>StreamBuilder</code>. Entender esto es clave.</p>
           </div>
         </div>
       </div>
@@ -1246,7 +1044,7 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
       <h2>Proyecto Integrador — Dart Fundamentals</h2>
       <div style="display:flex;flex-direction:column;gap:14px;">
         <div class="card highlight">
-          <p style="font-size:13px;line-height:1.7;color:var(--text);">🎯 <strong style="color:var(--dart);">Objetivo:</strong> Construir un sistema completo que integre <em>todos</em> los temas del módulo en un solo proyecto cohesivo y funcional. Deberás usar: variables, tipos, null safety, funciones, colecciones, OOP, async y manejo de errores.</p>
+          <p style="line-height:1.7;color:var(--text);">🎯 <strong style="color:var(--dart);">Objetivo:</strong> Construir un sistema completo que integre <em>todos</em> los temas del módulo en un solo proyecto cohesivo y funcional. Deberás usar: variables, tipos, null safety, funciones, colecciones, OOP, async y manejo de errores.</p>
         </div>
         <div class="exercise">
           <div class="exercise-header">
@@ -1265,19 +1063,18 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
             <li>En <code>main()</code>, maneja todo con <code>try/catch/finally</code> y muestra el resumen final</li>
           </ol>
         </div>
+      </div><!-- /slides -->
+
+      <!-- BOTTOM NAV -->
+      <div id="bottom">
+        <button class="btn btn-ghost" id="prev" onclick="navigate(-1)">← Anterior</button>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span id="slide-dots" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
+        </div>
+        <button class="btn btn-primary" id="next" onclick="navigate(1)">Siguiente →</button>
       </div>
     </div>
-
-  </div><!-- /slides -->
-
-  <!-- BOTTOM NAV -->
-  <div id="bottom">
-    <button class="btn btn-ghost" id="prev" onclick="navigate(-1)">← Anterior</button>
-    <div style="display:flex;gap:6px;align-items:center;">
-      <span id="slide-dots" style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></span>
-    </div>
-    <button class="btn btn-primary" id="next" onclick="navigate(1)">Siguiente →</button>
-  </div>
+  </div><!-- /main-wrapper -->
 
 </div>
 
@@ -1316,6 +1113,19 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
     document.body.classList.toggle('light-mode', !isDark);
     document.getElementById('themeBtn').querySelector('.toggle-icon').textContent = isDark ? '🌙' : '☀️';
     document.getElementById('themeLabel').textContent = isDark ? 'Oscuro' : 'Claro';
+  }
+
+  function toggleSidebar() {
+    const nav = document.getElementById('nav');
+    nav.classList.toggle('collapsed');
+  }
+
+  let rootSize = 16;
+  function adjustFont(delta) {
+    // Al ser el texto base 1rem, para variar 2px basta con sumar/restar 2 a la raíz
+    rootSize = Math.max(12, Math.min(32, rootSize + (delta * 2)));
+    document.documentElement.style.setProperty('--root-fs', rootSize + 'px');
+    document.body.offsetHeight; 
   }
 
   go(0);
