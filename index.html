@@ -20,7 +20,7 @@
     </div>
     <div class="progress-wrap">
       <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><span class="toggle-icon">🌙</span><span id="themeLabel">Oscuro</span></div>
-      <span class="slide-counter" id="counter">1 / 23</span>
+      <span class="slide-counter" id="counter">1 / 25</span>
       <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
     </div>
   </div>
@@ -59,21 +59,23 @@
           <div class="nav-pill" data-slide="14">Constructores</div>
           <div class="nav-pill" data-slide="15">Factory</div>
           <div class="nav-pill" data-slide="16">Herencia</div>
-          <div class="nav-pill" data-slide="17">Ejercicios S3</div>
+          <div class="nav-pill" data-slide="17">Interfaces</div>
+          <div class="nav-pill" data-slide="18">Mixins</div>
+          <div class="nav-pill" data-slide="19">Ejercicios S3</div>
         </div>
       </div>
 
       <div class="nav-group">
-        <div class="nav-pill" data-slide="18">📌 Sesión 4</div>
+        <div class="nav-pill" data-slide="20">📌 Sesión 4</div>
         <div class="nav-submenu">
-          <div class="nav-pill" data-slide="19">Async / Await</div>
-          <div class="nav-pill" data-slide="20">Errores</div>
-          <div class="nav-pill" data-slide="21">Ejercicios S4</div>
+          <div class="nav-pill" data-slide="21">Async / Await</div>
+          <div class="nav-pill" data-slide="22">Errores</div>
+          <div class="nav-pill" data-slide="23">Ejercicios S4</div>
         </div>
       </div>
 
       <div class="nav-group">
-        <div class="nav-pill" data-slide="22">🏆 Proyecto Final</div>
+        <div class="nav-pill" data-slide="24">🏆 Proyecto Final</div>
       </div>
     </div>
 
@@ -786,10 +788,11 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
     <!-- 14: HERENCIA -->
     <div class="slide slide-content">
       <div class="tag">Sesión 3 · Tema 6 cont.</div>
-      <h2>Herencia, Abstract e Interface</h2>
+      <h2>Herencia y Abstract</h2>
       <div class="two-col">
         <div>
           <h3>Herencia con extends</h3>
+          <p style="color:var(--muted); font-size: 14px; margin-bottom: 10px;">Usa <code>extends</code> para crear una relación "es un". Compartes comportamiento y estado.</p>
           <pre><span class="kw">class</span> <span class="ty">Animal</span> {
   <span class="ty">String</span> nombre<span class="op">;</span>
   <span class="ty">Animal</span>(<span class="kw">this</span>.nombre)<span class="op">;</span>
@@ -804,7 +807,8 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
 }</pre>
         </div>
         <div>
-          <h3>Clases abstractas e interfaces</h3>
+          <h3>Clases abstractas</h3>
+          <p style="color:var(--muted); font-size: 14px; margin-bottom: 10px;">Definen un molde que no se puede instanciar directamente.</p>
           <pre><span class="cm">// Clase abstracta</span>
 <span class="kw">abstract class</span> <span class="ty">Figura</span> {
   <span class="ty">double</span> <span class="fn">area</span>()<span class="op">;</span> <span class="cm">// método abstracto</span>
@@ -816,15 +820,77 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
 
   <span class="op">@</span><span class="kw">override</span>
   <span class="ty">double</span> <span class="fn">area</span>() <span class="op">=></span> <span class="num">3.14159</span> <span class="op">*</span> radio <span class="op">*</span> radio<span class="op">;</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14b: INTERFACES -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6 cont.</div>
+      <h2>Interfaces Implícitas</h2>
+      <div class="two-col">
+        <div>
+          <h3>Todo es una Interfaz</h3>
+          <p style="color:var(--muted);line-height:1.6;">En Dart, no existe <code>interface</code>. Cualquier clase puede ser implementada. Al usar <code>implements</code>, solo importas la <strong>firma</strong> (contrato), no la implementación.</p>
+          <pre style="margin-top:12px;"><span class="kw">class</span> <span class="ty">ControlRemoto</span> {
+  <span class="kw">void</span> <span class="fn">encender</span>() { <span class="cm">/* ... */</span> }
 }
 
-<span class="cm">// Mixin (reutilización sin herencia)</span>
-<span class="kw">mixin</span> <span class="ty">Volador</span> {
-  <span class="kw">void</span> <span class="fn">volar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="str">'Volando!'</span>)<span class="op">;</span>
-}
-<span class="kw">class</span> <span class="ty">Pato</span> <span class="kw">extends</span> <span class="ty">Animal</span> <span class="kw">with</span> <span class="ty">Volador</span> {
-  <span class="ty">Pato</span>() : <span class="kw">super</span>(<span class="str">'Pato'</span>)<span class="op">;</span>
+<span class="cm">// Implementar obliga a definir TODO</span>
+<span class="kw">class</span> <span class="ty">ControlTV</span> <span class="kw">implements</span> <span class="ty">ControlRemoto</span> {
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="kw">void</span> <span class="fn">encender</span>() {
+    <span class="fn">print</span>(<span class="str">'TV Encendida'</span>)<span class="op">;</span>
+  }
 }</pre>
+        </div>
+        <div>
+          <h3>Extends vs Implements</h3>
+          <table style="font-size:12px;">
+            <tr><th>Aspecto</th><th>extends</th><th>implements</th></tr>
+            <tr><td>Relación</td><td>Heredas de...</td><td>Cumples con...</td></tr>
+            <tr><td>Lógica</td><td>Reutilizas código</td><td>Reescribes todo</td></tr>
+            <tr><td>Cantidad</td><td>Solo una clase</td><td>Múltiples interfaces</td></tr>
+          </table>
+          <div class="card warn" style="margin-top:15px;">
+            <p style="color:var(--yellow);">💡 <strong>Regla de oro:</strong> Usa <code>extends</code> para compartir lógica interna y <code>implements</code> para definir un comportamiento externo común.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14c: MIXINS -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6 cont.</div>
+      <h2>Mixins: Reutilización sin Herencia</h2>
+      <div class="two-col">
+        <div>
+          <h3>¿Qué es un Mixin?</h3>
+          <p style="color:var(--muted);line-height:1.6;">Es una forma de inyectar código en una clase sin usar herencia. Ideal para comportamientos que no encajan en una jerarquía rígida.</p>
+          <pre style="margin-top:12px;"><span class="kw">mixin</span> <span class="ty">Caminante</span> {
+  <span class="kw">void</span> <span class="fn">caminar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="str">'Caminando...'</span>)<span class="op">;</span>
+}
+
+<span class="kw">mixin</span> <span class="ty">Nadador</span> {
+  <span class="kw">void</span> <span class="fn">nadar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="str">'Nadando...'</span>)<span class="op">;</span>
+}
+
+<span class="kw">class</span> <span class="ty">Pato</span> <span class="kw">extends</span> <span class="ty">Animal</span> <span class="kw">with</span> <span class="ty">Caminante</span>, <span class="ty">Nadador</span> {
+  <span class="ty">Pato</span>(<span class="ty">String</span> n) : <span class="kw">super</span>(n)<span class="op">;</span>
+}</pre>
+        </div>
+        <div>
+          <h3>Restricciones con <code>on</code></h3>
+          <p style="color:var(--muted);line-height:1.6;">Puedes limitar qué clases pueden usar un mixin.</p>
+          <pre><span class="kw">mixin</span> <span class="ty">HabilidadEspecial</span> <span class="kw">on</span> <span class="ty">Atleta</span> {
+  <span class="kw">void</span> <span class="fn">entrenar</span>() {
+    <span class="fn">print</span>(<span class="str">'Entrenando a </span><span class="op">$</span>nombre<span class="str">'</span>)<span class="op">;</span>
+  }
+}</pre>
+          <div class="card good" style="margin-top:15px;">
+            <p style="color:var(--green);">✓ <strong>Uso en Flutter:</strong> Verás mixins constantemente como <code>SingleTickerProviderStateMixin</code> para animaciones.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -901,9 +967,21 @@ a.<span class="fn">hablar</span>()<span class="op">;</span> <span class="cm">// 
     <div class="slide slide-content">
       <div class="tag">Sesión 4 · Tema 7</div>
       <h2>Programación Asíncrona</h2>
+      <div class="card highlight" style="margin-bottom:14px;">
+        <p style="line-height:1.7;color:var(--text);">
+          <strong style="color:var(--dart);">¿Cómo funciona?</strong> Dart es <em>Single Threaded</em> (un solo hilo), pero utiliza un <strong>Event Loop</strong> para gestionar la concurrencia. Cuando una operación de larga duración se inicia (como una petición red), Dart no "congela" la app; delega la tarea y continúa ejecutando el código siguiente. Cuando la tarea termina, el resultado se coloca en una cola para ser procesado en cuanto el hilo esté libre.
+        </p>
+      </div>
       <div class="two-col">
         <div>
           <h3>Future — promesa de un valor</h3>
+          <div style="color:var(--muted); font-size: 0.875rem; margin-bottom: 12px; line-height: 1.5;">
+            Representa una operación que finalizará en el futuro. Tiene dos estados posibles:
+            <ul style="margin-left: 20px; margin-top: 6px; list-style-type: disc;">
+              <li><strong>Incompleto:</strong> La operación asíncrona aún no ha terminado.</li>
+              <li><strong>Completado:</strong> Finalizó con éxito (un <strong>valor</strong>) o falló (un <strong>error</strong>).</li>
+            </ul>
+          </div>
           <pre><span class="cm">// Función que tarda (simula red/disco)</span>
 <span class="ty">Future</span><span class="op">&lt;</span><span class="ty">String</span><span class="op">&gt;</span> <span class="fn">obtenerDatos</span>() <span class="kw">async</span> {
   <span class="kw">await</span> <span class="ty">Future</span>.<span class="fn">delayed</span>(<span class="ty">Duration</span>(seconds: <span class="num">2</span>))<span class="op">;</span>
