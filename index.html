@@ -20,7 +20,7 @@
     </div>
     <div class="progress-wrap">
       <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><span class="toggle-icon">🌙</span><span id="themeLabel">Oscuro</span></div>
-      <span class="slide-counter" id="counter">1 / 25</span>
+      <span class="slide-counter" id="counter">1 / 26</span>
       <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
     </div>
   </div>
@@ -56,26 +56,27 @@
         <div class="nav-submenu">
           <div class="nav-pill" data-slide="12">Colecciones</div>
           <div class="nav-pill" data-slide="13">OOP Básica</div>
-          <div class="nav-pill" data-slide="14">Constructores</div>
-          <div class="nav-pill" data-slide="15">Factory</div>
-          <div class="nav-pill" data-slide="16">Herencia</div>
-          <div class="nav-pill" data-slide="17">Interfaces</div>
-          <div class="nav-pill" data-slide="18">Mixins</div>
-          <div class="nav-pill" data-slide="19">Ejercicios S3</div>
+          <div class="nav-pill" data-slide="14">Constructores primarios</div>
+          <div class="nav-pill" data-slide="15">Constructores</div>
+          <div class="nav-pill" data-slide="16">Factory</div>
+          <div class="nav-pill" data-slide="17">Herencia</div>
+          <div class="nav-pill" data-slide="18">Interfaces</div>
+          <div class="nav-pill" data-slide="19">Mixins</div>
+          <div class="nav-pill" data-slide="20">Ejercicios S3</div>
         </div>
       </div>
 
       <div class="nav-group">
-        <div class="nav-pill" data-slide="20">📌 Sesión 4</div>
+        <div class="nav-pill" data-slide="21">📌 Sesión 4</div>
         <div class="nav-submenu">
-          <div class="nav-pill" data-slide="21">Async / Await</div>
-          <div class="nav-pill" data-slide="22">Errores</div>
-          <div class="nav-pill" data-slide="23">Ejercicios S4</div>
+          <div class="nav-pill" data-slide="22">Async / Await</div>
+          <div class="nav-pill" data-slide="23">Errores</div>
+          <div class="nav-pill" data-slide="24">Ejercicios S4</div>
         </div>
       </div>
 
       <div class="nav-group">
-        <div class="nav-pill" data-slide="24">🏆 Proyecto Final</div>
+        <div class="nav-pill" data-slide="25">🏆 Proyecto Final</div>
       </div>
     </div>
 
@@ -600,6 +601,58 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
 <span class="kw">var</span> p0 <span class="op">=</span> <span class="ty">Punto</span>.origen()<span class="op">;</span></pre>
           <div class="card highlight" style="margin-top:12px;">
             <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 En Dart, <code>this.campo</code> en el constructor es un atajo que inicializa y asigna automáticamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11b: CONSTRUCTORES PRIMARIOS -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Dart 3.12+ (Experimental)</div>
+      <h2>Primary Constructors en Clases</h2>
+      <div class="two-col">
+        <div>
+          <h3>El Enfoque Tradicional (Antes)</h3>
+          <p style="color:var(--muted);line-height:1.7;margin-bottom:10px;">
+            Teníamos que declarar los campos <code>final</code> y luego crear un constructor que los inicializara (boilerplate).
+          </p>
+          <pre><span class="cm">// Verboso: Declaración + Constructor</span>
+<span class="kw">class</span> <span class="ty">UserCard</span> <span class="kw">extends</span> <span class="ty">StatelessWidget</span> {
+  <span class="kw">final</span> <span class="ty">String</span> name;
+  <span class="kw">final</span> <span class="ty">String</span> email;
+
+  <span class="kw">const</span> <span class="ty">UserCard</span>({
+    <span class="kw">required this</span>.name,
+    <span class="kw">required this</span>.email,
+    <span class="kw">super</span>.key,
+  });
+
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="ty">Widget</span> <span class="fn">build</span>(<span class="ty">BuildContext</span> context) { <span class="cm">/*...*/</span> }
+}</pre>
+        </div>
+        <div>
+          <h3>Sintaxis Primaria (Ahora)</h3>
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            Los parámetros se definen en el encabezado. Dart crea automáticamente los campos <code>final</code> y los inicializa.
+          </p>
+          <pre><span class="cm">// Conciso: Todo en una línea</span>
+<span class="kw">class</span> <span class="ty">UserCard</span>(<span class="ty">String</span> name, <span class="ty">String</span> email) 
+      <span class="kw">extends</span> <span class="ty">StatelessWidget</span> {
+
+  <span class="op">@</span><span class="kw">override</span>
+  <span class="ty">Widget</span> <span class="fn">build</span>(<span class="ty">BuildContext</span> context) {
+    <span class="kw">return</span> <span class="ty">Text</span>(<span class="str">'Hola </span><span class="op">$</span>name<span class="str">'</span>);
+  }
+}</pre>
+          <div class="card good" style="margin-top:12px;">
+            <p style="font-size:12px;color:var(--green);margin-bottom:6px;">✨ Beneficios Clave</p>
+            <table style="font-size:11px;">
+              <tr><th>Beneficio</th><th>Descripción</th></tr>
+              <tr><td>Cero Boilerplate</td><td>No repites los nombres de variables 3 veces.</td></tr>
+              <tr><td>Legibilidad</td><td>La "forma" de la clase se ve de un vistazo.</td></tr>
+              <tr><td>Inmutabilidad</td><td>Los parámetros son <code>final</code> por defecto.</td></tr>
+            </table>
           </div>
         </div>
       </div>
