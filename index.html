@@ -20,7 +20,7 @@
     </div>
     <div class="progress-wrap">
       <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><span class="toggle-icon">🌙</span><span id="themeLabel">Oscuro</span></div>
-      <span class="slide-counter" id="counter">1 / 26</span>
+      <span class="slide-counter" id="counter">1 / 27</span>
       <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
     </div>
   </div>
@@ -56,27 +56,28 @@
         <div class="nav-submenu">
           <div class="nav-pill" data-slide="12">Colecciones</div>
           <div class="nav-pill" data-slide="13">OOP Básica</div>
-          <div class="nav-pill" data-slide="14">Constructores primarios</div>
-          <div class="nav-pill" data-slide="15">Constructores nombrados</div>
-          <div class="nav-pill" data-slide="16">Factory</div>
-          <div class="nav-pill" data-slide="17">Herencia</div>
-          <div class="nav-pill" data-slide="18">Interfaces</div>
-          <div class="nav-pill" data-slide="19">Mixins</div>
-          <div class="nav-pill" data-slide="20">Ejercicios S3</div>
+          <div class="nav-pill" data-slide="14">Constructores</div>
+          <div class="nav-pill" data-slide="15">Constructores primarios</div>
+          <div class="nav-pill" data-slide="16">Constructores nombrados</div>
+          <div class="nav-pill" data-slide="17">Factory</div>
+          <div class="nav-pill" data-slide="18">Herencia</div>
+          <div class="nav-pill" data-slide="19">Interfaces</div>
+          <div class="nav-pill" data-slide="20">Mixins</div>
+          <div class="nav-pill" data-slide="21">Ejercicios S3</div>
         </div>
       </div>
 
       <div class="nav-group">
-        <div class="nav-pill" data-slide="21">📌 Sesión 4</div>
+        <div class="nav-pill" data-slide="22">📌 Sesión 4</div>
         <div class="nav-submenu">
-          <div class="nav-pill" data-slide="22">Async / Await</div>
-          <div class="nav-pill" data-slide="23">Errores</div>
-          <div class="nav-pill" data-slide="24">Ejercicios S4</div>
+          <div class="nav-pill" data-slide="23">Async / Await</div>
+          <div class="nav-pill" data-slide="24">Errores</div>
+          <div class="nav-pill" data-slide="25">Ejercicios S4</div>
         </div>
       </div>
 
       <div class="nav-group">
-        <div class="nav-pill" data-slide="25">🏆 Proyecto Final</div>
+        <div class="nav-pill" data-slide="26">🏆 Proyecto Final</div>
       </div>
     </div>
 
@@ -601,6 +602,53 @@ p.<span class="fn">presentarse</span>()<span class="op">;</span></pre>
 <span class="kw">var</span> p0 <span class="op">=</span> <span class="ty">Punto</span>.origen()<span class="op">;</span></pre>
           <div class="card highlight" style="margin-top:12px;">
             <p style="font-size:12px;line-height:1.6;color:var(--muted);">🔑 En Dart, <code>this.campo</code> en el constructor es un atajo que inicializa y asigna automáticamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11.5: CONSTRUCTORES GENERATIVOS -->
+    <div class="slide slide-content">
+      <div class="tag">Sesión 3 · Tema 6 cont.</div>
+      <h2>Constructores Generativos</h2>
+      <div class="two-col">
+        <div>
+          <h3>¿Qué es un constructor?</h3>
+          <p style="color:var(--muted);line-height:1.7;margin-bottom:10px;">
+            Es una función especial encargada de inicializar una instancia. Dart ofrece una sintaxis única para reducir el código repetitivo mediante los <strong>Initializing Formals</strong>.
+          </p>
+          <div class="card warn" style="margin-bottom:12px;">
+            <p style="color:var(--yellow);margin-bottom:4px;">⚠ Regla por defecto</p>
+            <p style="color:var(--muted);line-height:1.6;">Si no declaras un constructor, Dart genera uno automáticamente sin parámetros: <code>MiClase()</code>.</p>
+          </div>
+          <h3>Caso 1 — Sintaxis "this" (Sugar)</h3>
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">Elimina la necesidad de asignar manualmente variables en el cuerpo.</p>
+          <pre><span class="kw">class</span> <span class="ty">Perfil</span> {
+  <span class="kw">final</span> <span class="ty">String</span> username;
+
+  <span class="cm">// Asignación automática</span>
+  <span class="ty">Perfil</span>(<span class="kw">this</span>.username);
+}</pre>
+        </div>
+        <div>
+          <h3>Caso 2 — Lista de Inicialización</h3>
+          <p style="color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            Se ejecuta <strong>antes</strong> de que el objeto se cree. Ideal para validar datos o inicializar campos <code>final</code> calculados.
+          </p>
+          <pre><span class="kw">class</span> <span class="ty">Circulo</span> {
+  <span class="kw">final</span> <span class="ty">double</span> area;
+  <span class="cm">// Uso de ":" para cálculos previos</span>
+  <span class="ty">Circulo</span>(<span class="ty">double</span> radio) 
+    : area = <span class="num">3.14</span> * radio * radio;
+}</pre>
+          <div class="card highlight" style="margin-top:12px;">
+            <p style="font-size:12px;color:var(--muted);margin-bottom:6px;">🔑 Resumen de Variantes</p>
+            <table style="font-size:11px;">
+              <tr><th>Tipo</th><th>Propósito</th></tr>
+              <tr><td>Generativo</td><td>Instancia básica y común.</td></tr>
+              <tr><td>Redireccionado</td><td>Llama a otro constructor con <code>: this()</code>.</td></tr>
+              <tr><td>Const</td><td>Crea instancias inmutables (canónicas).</td></tr>
+            </table>
           </div>
         </div>
       </div>
